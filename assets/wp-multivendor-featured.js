@@ -31,7 +31,7 @@ const Categories = ({name, category, onChange}) => {
     )
 }
 
-const FeatureVendorAdd = () => {
+const FeatureVendorAdd = (props) => {
     const [state, setState] = useState({
         start_date: new Date().toISOString().slice(0, 10),
         days: 1,
@@ -60,14 +60,15 @@ const FeatureVendorAdd = () => {
         }
     }
 
+
+
     return (
         <div className="wcfm-container" style={{ marginBottom: 40 }}>
             <div className="wcfm-content">
                 <h2>Featured your store</h2>
                 <div className="gap-10" />
                 <form className="wcfm-vendor-featured-form wcfm-vendor-featured-store-form" method="POST">
-
-                    <input type="hidden" name="_activate_featured_store" defaultValue="23220de94e" /><input type="hidden" name="_wp_http_referer" defaultValue="/store-manager/featured/" />
+                    <input type="hidden" name="_nonce_featured_vendor" value={props._nonce} />
 
                     <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid">
                         <label>Start Date</label>
@@ -260,31 +261,15 @@ const FeaturedProducts = (props) => {
     )
 }
 
-
-
 const MultivendorFeatured = () => {
     const [state, setState] = useState({});
-
-
     useEffect(() => {
-
         jQuery.post(wc_featured.ajax, { action: "get_featured_data", _ajax_nonce: 'honneurCore._wp_ajax_nonce' }, function (data) {
-
-
-
             setState({ ...data });
 
         }).fail(() => {
-
             alert('Something wrong.')
-
         })
-
-
-
-
-        //get_featured_data
-
     }, [])
 
     const { vendor_featured, vendor_featured_products } = state;
@@ -292,7 +277,7 @@ const MultivendorFeatured = () => {
     return (
         <React.Fragment>
             {typeof vendor_featured === 'object' && <VendorFeaturedInfo {...vendor_featured} />}
-            {vendor_featured == '' && <FeatureVendorAdd />}
+            {vendor_featured == '' && <FeatureVendorAdd _nonce={state.nonce_vendor_featured} />}
 
             <FeaturedProducts _nonce={state.nonce_featured_products} />
         </React.Fragment>
