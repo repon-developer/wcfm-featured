@@ -12,8 +12,6 @@ array_walk($featured_products, function(&$item) use($pricing) {
     $item['price'] = $item['days'] * $price;
 });
 
-var_dump($featured_products);
-
 $total_price = array_sum(array_column($featured_products, 'price')); ?>
 
 <h2>Total Cost: $<?php echo $total_price; ?></h2>
