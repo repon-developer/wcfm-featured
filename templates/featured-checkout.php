@@ -9,11 +9,7 @@
  * @version   3.5.0
  */
 
-global $WCFM;
-
-var_dump($_SESSION);
-
-?>
+global $WCFM; ?>
 
 <div class="collapse wcfm-collapse" id="wcfm_shop_listing">
     <div class="wcfm-page-headig">
@@ -29,17 +25,20 @@ var_dump($_SESSION);
         <div class="gap-30"></div>
         <div class="wcfm-container">
             <div class="wcfm-content">
-                <?php featured_store_info($_SESSION['store_featured']); ?>
-                <div class="gap-30"></div>
 
-                <form metho="POST">
-                    <?php wp_nonce_field( 'memarjana', 'payment_success') ?>
-                    <button>Test Submit</button>
-                </form>
+                <?php 
+                    if ( isset($_SESSION['featured_vendor']) && is_object($_SESSION['featured_vendor']) ) {
+                        include_once 'featured-checkout-vendor.php';
+                    }
+                
 
+                    if ( isset($_SESSION['featured_products']) && is_array($_SESSION['featured_products']) ) {
+                        include_once 'featured-checkout-products.php';
+                    } ?>
 
-                <?php //echo do_shortcode('[wppayform id="81"]'); ?>
+                
             </div>
         </div>
     </div>
 </div>
+

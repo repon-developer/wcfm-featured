@@ -3,10 +3,12 @@
         minDate: 'today'
     });
 
+    
+
 })(jQuery);
 
 const { useState, useEffect, useRef } = React;
-const { categories, products } = wc_featured;
+const { categories, products } = wcfeatured;
 
 const main_category = categories.filter(cat => cat.parent == 0);
 
@@ -36,7 +38,9 @@ const FeatureVendorAdd = (props) => {
         start_date: new Date().toISOString().slice(0, 10),
         days: 1,
         category: ''
-    })
+    });
+
+    const price = parseFloat(props.price);
 
 
     useEffect(() => {
@@ -58,9 +62,12 @@ const FeatureVendorAdd = (props) => {
             e.preventDefault();
             return alert('Days is not valid');
         }
+
+        if (!state.category ) {
+            e.preventDefault();
+            return alert('Please select a category');
+        }
     }
-
-
 
     return (
         <div className="wcfm-container" style={{ marginBottom: 40 }}>
@@ -82,7 +89,7 @@ const FeatureVendorAdd = (props) => {
                         <Categories name="wcfm_featured_store_category" category={category} onChange={(category) => setState({...state, category})} />
 
                         <label>Total Price</label>
-                        <span>${days * 5.00}</span>
+                        <span>${(days * wcfeatured.vendor_price).toFixed(2)}</span>
                     </fieldset>
                     <div className="gap-60" />
                     <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
@@ -109,8 +116,6 @@ const VendorFeaturedInfo = (props) => {
                     <dd>{moment(start_date).add(days, 'days').format('DD MMM, YYYY')}</dd>
                     <dt>Category</dt>
                     <dd>{category}</dd>
-                    <dt>Total Cost</dt>
-                    <dd>{days * 5}</dd>
                 </dl>
             </div>
         </div>
@@ -262,9 +267,12 @@ const FeaturedProducts = (props) => {
 }
 
 const MultivendorFeatured = () => {
-    const [state, setState] = useState({});
+    const [state, setState] = useState({
+        status: 'loading'
+    });
+
     useEffect(() => {
-        jQuery.post(wc_featured.ajax, { action: "get_featured_data", _ajax_nonce: 'honneurCore._wp_ajax_nonce' }, function (data) {
+        jQuery.post(wcfeatured.ajax, { action: "get_featured_data"}, function (data) {
             setState({ ...data });
 
         }).fail(() => {
@@ -272,12 +280,16 @@ const MultivendorFeatured = () => {
         })
     }, [])
 
-    const { vendor_featured, vendor_featured_products } = state;
+    if ( state.status === 'loading' ) {
+        return <h2 className="loading">Loading...</h2>
+    }
+
+    const { featured_vendor } = state;
 
     return (
         <React.Fragment>
-            {typeof vendor_featured === 'object' && <VendorFeaturedInfo {...vendor_featured} />}
-            {vendor_featured == '' && <FeatureVendorAdd _nonce={state.nonce_vendor_featured} />}
+            {typeof featured_vendor === 'object' && <VendorFeaturedInfo {...featured_vendor} />}
+            {featured_vendor == '' && <FeatureVendorAdd price={state.featured_vendor_price} _nonce={state.nonce_vendor_featured} />}
 
             <FeaturedProducts _nonce={state.nonce_featured_products} />
         </React.Fragment>

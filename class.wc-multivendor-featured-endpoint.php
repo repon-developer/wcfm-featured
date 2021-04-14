@@ -42,15 +42,34 @@ class WCFM_Multivendor_Featured_Endpoint {
         add_action( 'init', [$this, 'store_featured_before_payment']);
         add_action( 'init', [$this, 'products_featured_before_payment']);
 
-        add_action( 'init', [$this, 'store_featured_successfull']);
-
         add_filter( 'script_loader_tag', [$this, 'enqueue_babel_script'], 10, 3 ); 
+
+        //fire event after successful payment
+        add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
+
+        //$this->featured_info_payment_successfull('');
+    }
+
+    function featured_info_payment_successfull($submission) {
+        error_log(print_r($submission, true));
+
+        if ( isset($_SESSION['featured_products']) ) {
+            update_user_meta( get_current_user_id(), 'featured_products', $_SESSION['featured_products'] );
+        }
+
+
+        if ( isset($_SESSION['featured_vendor']) ) {
+            update_user_meta( get_current_user_id(), 'featured_vendor', $_SESSION['featured_vendor'] );
+        }
+
+        if ( isset($_REQUEST['wpf_action']) && $_REQUEST['wpf_action'] == 'stripe_hosted_success' ) {
+            wp_safe_redirect(get_wcfm_vendor_featured_url()); 
+            exit;
+        }        
     }
 
     function store_featured_before_payment() {
-        
-        global $featured_error;
-        if ( !wp_verify_nonce( $_POST['_activate_featured_store'], 'activate_featured_store') ) {
+        if (!wp_verify_nonce($_POST['_nonce_featured_vendor'], 'vendor_featured') ) {
             return;
         }
 
@@ -73,7 +92,7 @@ class WCFM_Multivendor_Featured_Endpoint {
 
         unset($_SESSION['featured_products']);
 
-        $_SESSION['store_featured'] = (object) array(
+        $_SESSION['featured_vendor'] = (object) array(
             'start_date' => $_POST['wcfm_featured_store_start_date'],
             'days' => $_POST['wcfm_featured_store_days'],
             'category' => $_POST['wcfm_featured_store_category'],
@@ -88,7 +107,7 @@ class WCFM_Multivendor_Featured_Endpoint {
             return;
         }
 
-        unset($_SESSION['store_featured']);
+        unset($_SESSION['featured_vendor']);
 
         $_SESSION['featured_products'] = $_POST['featured_products'];
 
@@ -97,16 +116,7 @@ class WCFM_Multivendor_Featured_Endpoint {
     }
 
 
-    function store_featured_successfull() {
-        if (!wp_verify_nonce( $_REQUEST['payment_success'], 'memarjana') ) return;
-
-        if ( is_valid_featured_store_info($_SESSION['store_featured']) ) {
-            update_user_meta( get_current_user_id(), 'store_feature_info', $_SESSION['store_featured'] );
-        }
-
-        wp_safe_redirect(get_wcfm_vendor_featured_url());
-        exit;
-    }
+    
 
     function featured_wcfm_init() {
         global $WCFM_Query;
@@ -126,7 +136,7 @@ class WCFM_Multivendor_Featured_Endpoint {
         $featured_menus = array( 'wcfm-featured' => array(   'label'  => __( 'Featured', 'wc-frontend-manager'),
             'label' => 'Featured',
             'url' => get_wcfm_vendor_featured_url(),
-            'icon' => 'cube',
+            'icon' => 'star',
             'priority' => 3
         ) );
 
@@ -149,10 +159,13 @@ class WCFM_Multivendor_Featured_Endpoint {
     }
 
     public function wcfm_customers_load_scripts( $end_point ) {
-        if ( 'wcfm-featured' !== $end_point ) return;
+        if ( 'wcfm-featured' !== $end_point) return;
+
         wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], null, true);
-        wp_localize_script( 'wc-multivendor-featured', 'wc_featured', [
+        wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
             'ajax' => admin_url( 'admin-ajax.php' ),
+            'pricing' => get_featured_category_pricing(),
+            'vendor_price' => get_featured_vendor_price(),
             'products' => get_posts( ['post_type' => 'product', 'author' => get_current_user_id()] ),
             'categories' => get_terms( 'product_cat', array('hide_empty' => false) )
         ]);

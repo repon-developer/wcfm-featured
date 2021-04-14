@@ -38,17 +38,19 @@ class WCFM_Multivendor_Featured {
 
     function get_featured_data() {
 
-        $vendor_featured = get_user_meta( get_current_user_id(), 'store_feature_info', true);
+        $featured_vendor = get_user_meta( get_current_user_id(), 'featured_vendor', true);
 
-        if ( isset($vendor_featured->category) ) {
-            $term = get_term_by( 'id', $vendor_featured->category, 'product_cat');
-            $vendor_featured->category = $term->name;
+        if ( isset($featured_vendor->category) ) {
+            $term = get_term_by( 'id', $featured_vendor->category, 'product_cat');
+            $featured_vendor->category = $term->name;
         }
 
         wp_send_json([
-            'vendor_featured' => $vendor_featured,
+            'featured_vendor' => $featured_vendor,
+            'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
+
+            'vendor_featured_products' => [],            
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
-            'vendor_featured_products' => []
         ]);
 
     }

@@ -1,5 +1,13 @@
 <?php
 
+function get_featured_vendor_price() {
+    return 5.99;
+}
+
+function get_featured_category_pricing() {
+    return array('main' => 2.99, 'sub' => 1.99);
+}
+
 function featured_store_info($info) {
     $term = get_term_by( 'id', $info->category, 'product_cat');
     $expire = Date('Y-m-d', strtotime(sprintf("%s + %d days", $info->start_date, $info->days))); ?>
