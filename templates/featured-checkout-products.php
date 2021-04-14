@@ -60,16 +60,6 @@ $total_price = array_sum(array_column($featured_products, 'price')); ?>
             <td>$<?php echo $total_price; ?></td>
         </tr>
     </tfoot>
-    
-
-
-  
 </table>
-
-
-<div class="gap-10"></div>
 <?php echo do_shortcode('[wppayform id="81"]'); ?>
-
-<script>
-jQuery('[name="custom_payment_input"]').val(<?php echo $total_price ?>)
-</script>
+<script>jQuery('[name="custom_payment_input"]').val(<?php echo $total_price ?>)</script>
