@@ -81,7 +81,7 @@ const FeatureVendorAdd = () => {
                         <Categories name="wcfm_featured_store_category" category={category} onChange={(category) => setState({...state, category})} />
 
                         <label>Total Price</label>
-                        <span>{days * 5}</span>
+                        <span>${days * 5.00}</span>
                     </fieldset>
                     <div className="gap-60" />
                     <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
