@@ -47,8 +47,10 @@ class WCFM_Multivendor_Featured {
 
         wp_send_json([
             'vendor_featured' => $vendor_featured,
+            'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
             'vendor_featured_products' => []
         ]);
+
     }
     
 }

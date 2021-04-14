@@ -179,7 +179,7 @@ const ProductItem = (props) => {
     )
 }
 
-const FeaturedProducts = () => {
+const FeaturedProducts = (props) => {
     const [products, setProducts ] = useState([
         {id: '', start: '', days: 1, category: ''}
     ]);
@@ -239,13 +239,13 @@ const FeaturedProducts = () => {
         }
     }
 
-
     return (
         <div className="wcfm-container">
             <div className="wcfm-content">
                 <h2>Featured your product</h2>
                 <div className="gap-20" />
                 <form className="wcfm-vendor-featured-form wcfm-vendor-featured-product-form" method="post">
+                    <input type="hidden" name="_nonce_featured_products" value={props._nonce} />
                     <div className="wcfm_clearfix" />
                     
                     {products.map((p, index) => <ProductItem onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
@@ -294,7 +294,7 @@ const MultivendorFeatured = () => {
             {typeof vendor_featured === 'object' && <VendorFeaturedInfo {...vendor_featured} />}
             {vendor_featured == '' && <FeatureVendorAdd />}
 
-            <FeaturedProducts />
+            <FeaturedProducts _nonce={state.nonce_featured_products} />
         </React.Fragment>
     )
 

@@ -40,12 +40,15 @@ class WCFM_Multivendor_Featured_Endpoint {
         add_action( 'wcfm_load_views', array( &$this, 'wcfm_customers_load_views' ), 30 );
 
         add_action( 'init', [$this, 'store_featured_before_payment']);
+        add_action( 'init', [$this, 'products_featured_before_payment']);
+
         add_action( 'init', [$this, 'store_featured_successfull']);
 
         add_filter( 'script_loader_tag', [$this, 'enqueue_babel_script'], 10, 3 ); 
     }
 
     function store_featured_before_payment() {
+        
         global $featured_error;
         if ( !wp_verify_nonce( $_POST['_activate_featured_store'], 'activate_featured_store') ) {
             return;
@@ -68,6 +71,8 @@ class WCFM_Multivendor_Featured_Endpoint {
             return;
         }
 
+        unset($_SESSION['featured_products']);
+
         $_SESSION['store_featured'] = (object) array(
             'start_date' => $_POST['wcfm_featured_store_start_date'],
             'days' => $_POST['wcfm_featured_store_days'],
@@ -77,6 +82,20 @@ class WCFM_Multivendor_Featured_Endpoint {
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
     }
+
+    function products_featured_before_payment() {
+        if (!wp_verify_nonce($_POST['_nonce_featured_products'], 'vendor_featured_products') ) {
+            return;
+        }
+
+        unset($_SESSION['store_featured']);
+
+        $_SESSION['featured_products'] = $_POST['featured_products'];
+
+        wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
+        exit;
+    }
+
 
     function store_featured_successfull() {
         if (!wp_verify_nonce( $_REQUEST['payment_success'], 'memarjana') ) return;

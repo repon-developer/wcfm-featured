@@ -9,7 +9,11 @@
  * @version   3.5.0
  */
 
-global $WCFM; ?>
+global $WCFM;
+
+var_dump($_SESSION);
+
+?>
 
 <div class="collapse wcfm-collapse" id="wcfm_shop_listing">
     <div class="wcfm-page-headig">
