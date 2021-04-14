@@ -200,34 +200,42 @@ const FeaturedProducts = () => {
     }
     
     const on_submit = (e) => {
-        e.preventDefault();
-        
-        
-        products.forEach((product) => {
+        let error = null;
+
+        for (const key in products) {
+            const product = products[key];
+
             if ( !product.id ) {
-                return alert('Please select a product');
+                error = 'Please select a product';
+                continue;
             }
 
             if ( !product.start ) {
-                return alert('Please select start date');
+                error = 'Please select start date';
+                continue;
             }
 
             if ( !product.days ) {
-                return alert('Please specify duration');
+                error = 'Please specify duration';
+                continue;
             }
             
             if ( !product.category ) {
-                return alert('Please select a category');
+                error = 'Please select a category';
+                continue;
             }
-        })
-
+        }
 
         const result = products.map(a => a.id);
-
         let findDuplicates = result.filter((item, index) => result.indexOf(item) != index)
 
         if ( findDuplicates.length) {
-            return alert('Please select unique product.')
+            error = 'Please select unique product.';
+        }
+
+        if ( error ) {
+            e.preventDefault();
+            return alert(error)
         }
     }
 
@@ -237,7 +245,7 @@ const FeaturedProducts = () => {
             <div className="wcfm-content">
                 <h2>Featured your product</h2>
                 <div className="gap-20" />
-                <form className="wcfm-vendor-featured-form wcfm-vendor-featured-product-form">
+                <form className="wcfm-vendor-featured-form wcfm-vendor-featured-product-form" method="post">
                     <div className="wcfm_clearfix" />
                     
                     {products.map((p, index) => <ProductItem onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
