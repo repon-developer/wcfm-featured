@@ -142,36 +142,39 @@ const ProductItem = (props) => {
         }
     }
 
+    const on_delete = (index) => {
+        if (typeof props.onDelete === 'function') {
+            props.onDelete(index)
+        }
+    }
+
     const childs = get_sub_categories(product.category);
 
-    console.log(childs)
-    
     return (
         <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid wcfm-vendor-featured-fieldset-product-grid">
+            <span className="btn-delete" onClick={() => on_delete(props.number)}>Delete</span>
             <label>Product</label>
-            <select className="wcfm-select" onChange={(e) => update({...product, id: e.target.value})} >
+            <select name={`featured_products[${props.number}][id]`} className="wcfm-select" onChange={(e) => update({...product, id: e.target.value})} >
                 <option value="">Select a product</option>
                 {products.map((product) => {
                     return <option value={product.ID}>{product.post_title}</option>
                 })}
             </select>
             <label>Start Date</label>
-            <input ref={datepicker} type="text" className="wcfm-text wc-multivendor-featured-datepicker" value={product.start} />
+            <input name={`featured_products[${props.number}][start]`} ref={datepicker} type="text" className="wcfm-text wc-multivendor-featured-datepicker" value={product.start} />
             <label>Days</label>
-            <input type="text" className="wcfm-text" defaultValue={product.days} onChange={(e) => update({...product, days: e.target.value})} />
+            <input type="text" name={`featured_products[${props.number}][days]`} className="wcfm-text" defaultValue={product.days} onChange={(e) => update({...product, days: e.target.value})} />
             <label>Category</label>
-            <Categories category={product.category} onChange={(category) => update({...product, category})} />
+            <Categories name={`featured_products[${props.number}][category]`} category={product.category} onChange={(category) => update({...product, category})} />
 
             {childs.length > 0 && 
                 <React.Fragment>
                     <label>Sub Category</label>
-                    <select className="wcfm-select">
+                    <select className="wcfm-select" name={`featured_products[${props.number}][sub]`}>
                         {childs.map(c => <option value={c.term_id}>{c.name}</option>)}
                     </select>
                 </React.Fragment>
             }
-
-            
         </fieldset>
     )
 }
@@ -191,13 +194,16 @@ const FeaturedProducts = () => {
         setProducts([...products])
     }
 
+    const on_delete = (index) => {
+        products.splice(index, 1);
+        setProducts([...products])
+    }
     
     const on_submit = (e) => {
         e.preventDefault();
         
         
         products.forEach((product) => {
-            console.log(product);
             if ( !product.id ) {
                 return alert('Please select a product');
             }
@@ -234,7 +240,7 @@ const FeaturedProducts = () => {
                 <form className="wcfm-vendor-featured-form wcfm-vendor-featured-product-form">
                     <div className="wcfm_clearfix" />
                     
-                    {products.map((p, index) => <ProductItem key={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
+                    {products.map((p, index) => <ProductItem onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
 
                     <span className="add-new-btn" onClick={add_feature_product}>Add Feature Product</span>
                     

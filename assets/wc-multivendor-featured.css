@@ -9,6 +9,7 @@
 
 #wcfm-main-contentainer fieldset.wcfm-vendor-featured-fieldset {
     clear: both;
+    position: relative;
 }
 
 #wc-multivendor-featured .add-new-btn {
@@ -17,6 +18,20 @@
     cursor: pointer;
     display: inline-block;
     border: 1px solid #ccc;
+}
+
+#wc-multivendor-featured .btn-delete {
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 12px;
+    display: inline-block;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: #e04042;
 }
 
 .wcfm-vendor-featured-fieldset-grid {
