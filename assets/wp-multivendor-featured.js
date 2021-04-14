@@ -336,7 +336,9 @@ const MultivendorFeatured = () => {
             <FeaturedProductsAdd _nonce={state.nonce_featured_products} />
         </React.Fragment>
     )
-
 }
 
-ReactDOM.render(<MultivendorFeatured />, document.getElementById("wc-multivendor-featured"));
+const root_holder = document.getElementById("wc-multivendor-featured");
+if ( root_holder ) {
+    ReactDOM.render(<MultivendorFeatured />, root_holder);
+}

@@ -28,6 +28,11 @@ function get_wcfm_vendor_featured_url($endpoint = 'wcfm-featured') {
 class WCFM_Multivendor_Featured_Endpoint {
 
     function __construct() {
+        $current_user = get_currentuserinfo();
+        if ( !in_array('wcfm_vendor', $current_user->roles) ) {
+            return;
+        }
+
         if (!session_id() ) {
             session_start();
         }
@@ -117,9 +122,6 @@ class WCFM_Multivendor_Featured_Endpoint {
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
     }
-
-
-    
 
     function featured_wcfm_init() {
         global $WCFM_Query;
