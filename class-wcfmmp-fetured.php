@@ -19,6 +19,9 @@ class WCFM_Multivendor_Featured {
 
     private function load() {
         require_once WCFM_FEATURED_PATH . 'helpers.php';
+
+        include_once 'featured-cron.php';
+        $this->cron = new WCFM_Multivendor_Featured_Cron();
         
         include_once 'featured-settings.php';
         $this->settings = new WCFM_Multivendor_Featured_Settings();

@@ -269,9 +269,7 @@ const FeaturedProductsAdd = (props) => {
 
 
 const FeaturedProducts = (props) => {
-    const { products } = props;
-
-    console.log(products)
+    const products = Object.values(props.products)
 
     return (
         <table class="table-featured-products">
@@ -293,8 +291,7 @@ const FeaturedProducts = (props) => {
                 </tr>
             }
 
-
-            {products.length > 0 && products.map((product) =>
+            {products.length > 0 && products.map((product) => 
                 <tr>
                     <td>#{product.id}</td>
                     <td>{product.post_title}</td>
@@ -328,8 +325,6 @@ const MultivendorFeatured = () => {
     }
 
     const { featured_vendor, vendor_featured_products } = state;
-
-    console.log(vendor_featured_products)
 
     return (
         <React.Fragment>

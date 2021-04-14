@@ -57,10 +57,12 @@ class WCFM_Multivendor_Featured_Endpoint {
             $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
             $featured_products = array_merge($featured_products, $_SESSION['featured_products']);
             update_user_meta( get_current_user_id(), 'featured_products', $featured_products );
+            unset($_SESSION['featured_products']);
         }
 
         if ( isset($_SESSION['featured_vendor']) ) {
             update_user_meta( get_current_user_id(), 'featured_vendor', $_SESSION['featured_vendor'] );
+            unset($_SESSION['featured_vendor']);
         }
 
         if ( isset($_REQUEST['wpf_action']) && $_REQUEST['wpf_action'] == 'stripe_hosted_success' ) {

@@ -28,21 +28,3 @@ add_action( 'wcfmmp_loaded', function(){
 	require_once( 'class-wcfmmp-fetured.php' );
 	$GLOBALS['WCFM_Multivendor_Featured'] = new WCFM_Multivendor_Featured();
 });
-
-
-
-add_action( 'init', function(){
-    if ( !isset($_GET['dev']) ) return;
-
-	$featured_info = get_user_meta( get_current_user_id(), 'store_feature_info', true);
-
-	if ( isset($featured_info->category) ) {
-		$term = get_term_by( 'id', $featured_info->category, 'product_cat');
-		$featured_info->category = $term->name;
-	}
-
-	var_dump($featured_info);
-
-
-    exit;
-});
