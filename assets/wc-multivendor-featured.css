@@ -92,3 +92,9 @@ table.table-featured-products caption {
     padding: 5px 0;
     text-align: left;
 }
+
+table.table-featured-products tfoot {
+    text-align: right
+}
+
+table.table-featured-products tfoot tr td:last-child {text-align: left;}

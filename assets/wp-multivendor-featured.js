@@ -160,7 +160,7 @@ const ProductItem = (props) => {
         <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid wcfm-vendor-featured-fieldset-product-grid">
             <span className="btn-delete" onClick={() => on_delete(props.number)}>Delete</span>
             <label>Product</label>
-            <select name={`featured_products[${props.number}][id]`} className="wcfm-select" onChange={(e) => update({ ...product, id: e.target.value })} >
+            <select defaultValue={product.id} name={`featured_products[${props.number}][id]`} className="wcfm-select" onChange={(e) => update({ ...product, id: e.target.value })} >
                 <option value="">Select a product</option>
                 {products.map((product) => {
                     return <option value={product.ID}>{product.post_title}</option>
@@ -176,7 +176,7 @@ const ProductItem = (props) => {
             {childs.length > 0 &&
                 <React.Fragment>
                     <label>Sub Category</label>
-                    <select className="wcfm-select" name={`featured_products[${props.number}][sub]`}>
+                    <select defaultValue={product.sub} className="wcfm-select" name={`featured_products[${props.number}][sub]`}>
                         <option value="">Select Sub Category</option>
                         {childs.map(c => <option value={c.term_id}>{c.name}</option>)}
                     </select>
@@ -187,9 +187,7 @@ const ProductItem = (props) => {
 }
 
 const FeaturedProductsAdd = (props) => {
-    const [products, setProducts] = useState([
-        { id: '', start: '', days: 1, category: '' }
-    ]);
+    const [products, setProducts] = useState(props.products);
 
     const add_feature_product = () => {
         products.push({ id: '', start: '', days: 1, category: '' });
@@ -324,7 +322,7 @@ const MultivendorFeatured = () => {
         return <h2 className="loading">Loading...</h2>
     }
 
-    const { featured_vendor, vendor_featured_products } = state;
+    const { featured_vendor, vendor_featured_products, session_products } = state;
 
     return (
         <React.Fragment>
@@ -333,7 +331,7 @@ const MultivendorFeatured = () => {
 
             <FeaturedProducts products={vendor_featured_products} />
 
-            <FeaturedProductsAdd _nonce={state.nonce_featured_products} />
+            <FeaturedProductsAdd products={session_products} _nonce={state.nonce_featured_products} />
         </React.Fragment>
     )
 }

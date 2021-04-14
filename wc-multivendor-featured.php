@@ -34,6 +34,8 @@ add_action( 'init', function(){
 
 	if ( !isset($_GET['dev'])) return;
 
+	var_dump($_SESSION);
+
 	
 	
 	exit;
