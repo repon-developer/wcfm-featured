@@ -20,10 +20,10 @@ class WCFM_Multivendor_Featured {
     private function load() {
         require_once WCFM_FEATURED_PATH . 'helpers.php';
         
-        include_once 'wc-multivendor-featured-settings.php';
+        include_once 'featured-settings.php';
         $this->settings = new WCFM_Multivendor_Featured_Settings();
         
-        include_once 'class.wc-multivendor-featured-endpoint.php';
+        include_once 'featured-endpoint.php';
         $this->endpoints = new WCFM_Multivendor_Featured_Endpoint();
     }
 
@@ -49,7 +49,7 @@ class WCFM_Multivendor_Featured {
             'featured_vendor' => $featured_vendor,
             'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
 
-            'vendor_featured_products' => [],            
+            'vendor_featured_products' => get_wcfm_featured_products(),            
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
         ]);
 

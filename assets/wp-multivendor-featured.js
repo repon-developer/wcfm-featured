@@ -3,7 +3,7 @@
         minDate: 'today'
     });
 
-    
+
 
 })(jQuery);
 
@@ -16,9 +16,9 @@ const get_sub_categories = (parent) => {
     return parent && parent > 0 ? categories.filter(cat => cat.parent == parent) : [];
 }
 
-const Categories = ({name, category, onChange}) => {
+const Categories = ({ name, category, onChange }) => {
     const on_update = (e) => {
-        if ( typeof onChange === 'function' ) {
+        if (typeof onChange === 'function') {
             onChange(e.target.value)
         }
     }
@@ -63,7 +63,7 @@ const FeatureVendorAdd = (props) => {
             return alert('Days is not valid');
         }
 
-        if (!state.category ) {
+        if (!state.category) {
             e.preventDefault();
             return alert('Please select a category');
         }
@@ -86,7 +86,7 @@ const FeatureVendorAdd = (props) => {
 
                         <label>Category</label>
 
-                        <Categories name="wcfm_featured_store_category" category={category} onChange={(category) => setState({...state, category})} />
+                        <Categories name="wcfm_featured_store_category" category={category} onChange={(category) => setState({ ...state, category })} />
 
                         <label>Total Price</label>
                         <span>${(days * wcfeatured.vendor_price).toFixed(2)}</span>
@@ -124,19 +124,19 @@ const VendorFeaturedInfo = (props) => {
 }
 
 const ProductItem = (props) => {
-    const {product} = props;
+    const { product } = props;
 
     const datepicker = useRef(null);
 
     useEffect(() => {
-        jQuery(datepicker.current).flatpickr({minDate: 'today'})
+        jQuery(datepicker.current).flatpickr({ minDate: 'today' })
 
     }, [datepicker.current]);
 
     useEffect(() => {
-        jQuery(datepicker.current).change(function(selectedDates, dateStr, instance){
+        jQuery(datepicker.current).change(function (selectedDates, dateStr, instance) {
             if (typeof props.onChange === 'function') {
-                props.onChange({...product, start: selectedDates.target.value})
+                props.onChange({ ...product, start: selectedDates.target.value })
             }
         })
 
@@ -160,7 +160,7 @@ const ProductItem = (props) => {
         <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid wcfm-vendor-featured-fieldset-product-grid">
             <span className="btn-delete" onClick={() => on_delete(props.number)}>Delete</span>
             <label>Product</label>
-            <select name={`featured_products[${props.number}][id]`} className="wcfm-select" onChange={(e) => update({...product, id: e.target.value})} >
+            <select name={`featured_products[${props.number}][id]`} className="wcfm-select" onChange={(e) => update({ ...product, id: e.target.value })} >
                 <option value="">Select a product</option>
                 {products.map((product) => {
                     return <option value={product.ID}>{product.post_title}</option>
@@ -169,14 +169,15 @@ const ProductItem = (props) => {
             <label>Start Date</label>
             <input name={`featured_products[${props.number}][start]`} ref={datepicker} type="text" className="wcfm-text wc-multivendor-featured-datepicker" value={product.start} />
             <label>Days</label>
-            <input type="text" name={`featured_products[${props.number}][days]`} className="wcfm-text" defaultValue={product.days} onChange={(e) => update({...product, days: e.target.value})} />
+            <input type="text" name={`featured_products[${props.number}][days]`} className="wcfm-text" defaultValue={product.days} onChange={(e) => update({ ...product, days: e.target.value })} />
             <label>Category</label>
-            <Categories name={`featured_products[${props.number}][category]`} category={product.category} onChange={(category) => update({...product, category})} />
+            <Categories name={`featured_products[${props.number}][category]`} category={product.category} onChange={(category) => update({ ...product, category })} />
 
-            {childs.length > 0 && 
+            {childs.length > 0 &&
                 <React.Fragment>
                     <label>Sub Category</label>
                     <select className="wcfm-select" name={`featured_products[${props.number}][sub]`}>
+                        <option value="">Select Sub Category</option>
                         {childs.map(c => <option value={c.term_id}>{c.name}</option>)}
                     </select>
                 </React.Fragment>
@@ -185,13 +186,13 @@ const ProductItem = (props) => {
     )
 }
 
-const FeaturedProducts = (props) => {
-    const [products, setProducts ] = useState([
-        {id: '', start: '', days: 1, category: ''}
+const FeaturedProductsAdd = (props) => {
+    const [products, setProducts] = useState([
+        { id: '', start: '', days: 1, category: '' }
     ]);
 
     const add_feature_product = () => {
-        products.push({id: '', start: '', days: 1, category: ''});
+        products.push({ id: '', start: '', days: 1, category: '' });
         setProducts([...products])
     }
 
@@ -204,29 +205,29 @@ const FeaturedProducts = (props) => {
         products.splice(index, 1);
         setProducts([...products])
     }
-    
+
     const on_submit = (e) => {
         let error = null;
 
         for (const key in products) {
             const product = products[key];
 
-            if ( !product.id ) {
+            if (!product.id) {
                 error = 'Please select a product';
                 continue;
             }
 
-            if ( !product.start ) {
+            if (!product.start) {
                 error = 'Please select start date';
                 continue;
             }
 
-            if ( !product.days ) {
+            if (!product.days) {
                 error = 'Please specify duration';
                 continue;
             }
-            
-            if ( !product.category ) {
+
+            if (!product.category) {
                 error = 'Please select a category';
                 continue;
             }
@@ -235,11 +236,11 @@ const FeaturedProducts = (props) => {
         const result = products.map(a => a.id);
         let findDuplicates = result.filter((item, index) => result.indexOf(item) != index)
 
-        if ( findDuplicates.length) {
+        if (findDuplicates.length) {
             error = 'Please select unique product.';
         }
 
-        if ( error ) {
+        if (error) {
             e.preventDefault();
             return alert(error)
         }
@@ -248,16 +249,16 @@ const FeaturedProducts = (props) => {
     return (
         <div className="wcfm-container">
             <div className="wcfm-content">
-                <h2>Featured your product</h2>
+                <h2>Add your product at Featured list</h2>
                 <div className="gap-20" />
                 <form className="wcfm-vendor-featured-form wcfm-vendor-featured-product-form" method="post">
                     <input type="hidden" name="_nonce_featured_products" value={props._nonce} />
                     <div className="wcfm_clearfix" />
-                    
+
                     {products.map((p, index) => <ProductItem onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
 
                     <span className="add-new-btn" onClick={add_feature_product}>Add Feature Product</span>
-                    
+
                     <div className="gap-60" />
                     <button className="wcfm_submit_button" onClick={on_submit}>Activate Now</button>
                 </form>
@@ -266,13 +267,55 @@ const FeaturedProducts = (props) => {
     )
 }
 
+
+const FeaturedProducts = (props) => {
+    const { products } = props;
+
+    console.log(products)
+
+    return (
+        <table class="table-featured-products">
+            <caption>Your Featured Products</caption>
+            <thead>
+                <tr>
+                    <th>#ID</th>
+                    <th>Name</th>
+                    <th>Start Date</th>
+                    <th>Expired on</th>
+                    <th>Days</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+
+            {products.length == 0 && 
+                 <tr>
+                    <td colSpan={7} style={{textAlign: 'center'}}>No Products</td>
+                </tr>
+            }
+
+
+            {products.length > 0 && products.map((product) =>
+                <tr>
+                    <td>#{product.id}</td>
+                    <td>{product.post_title}</td>
+                    <td>{moment(product.start).format('DD MMM, YYYY')}</td>
+                    <td>{moment(product.start).add(product.days, 'days').format('DD MMM, YYYY')}</td>
+                    <td>{product.days}</td>
+                    <td>{product.term_name}</td>
+                </tr>
+            )}
+
+        </table>
+    );
+}
+
 const MultivendorFeatured = () => {
     const [state, setState] = useState({
         status: 'loading'
     });
 
     useEffect(() => {
-        jQuery.post(wcfeatured.ajax, { action: "get_featured_data"}, function (data) {
+        jQuery.post(wcfeatured.ajax, { action: "get_featured_data" }, function (data) {
             setState({ ...data });
 
         }).fail(() => {
@@ -280,18 +323,22 @@ const MultivendorFeatured = () => {
         })
     }, [])
 
-    if ( state.status === 'loading' ) {
+    if (state.status === 'loading') {
         return <h2 className="loading">Loading...</h2>
     }
 
-    const { featured_vendor } = state;
+    const { featured_vendor, vendor_featured_products } = state;
+
+    console.log(vendor_featured_products)
 
     return (
         <React.Fragment>
             {typeof featured_vendor === 'object' && <VendorFeaturedInfo {...featured_vendor} />}
             {featured_vendor == '' && <FeatureVendorAdd price={state.featured_vendor_price} _nonce={state.nonce_vendor_featured} />}
 
-            <FeaturedProducts _nonce={state.nonce_featured_products} />
+            <FeaturedProducts products={vendor_featured_products} />
+
+            <FeaturedProductsAdd _nonce={state.nonce_featured_products} />
         </React.Fragment>
     )
 

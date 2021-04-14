@@ -82,3 +82,13 @@ dl.store-featured-info > dt, dl.store-featured-info > dd {
 }
 
 .wpf_form_group.wpf_item_custom_payment_input {display: none!important;}
+
+table.table-featured-products {background-color: #fff;}
+table.table-featured-products thead {text-align: left;}
+
+table.table-featured-products caption {
+    color: #17a2b8;
+    font-style: italic;
+    padding: 5px 0;
+    text-align: left;
+}

@@ -10,6 +10,4 @@ $price = $vendor_featured->days * get_featured_vendor_price(); ?>
 
 <?php echo do_shortcode('[wppayform id="81"]'); ?>
 
-<script>
-    jQuery('[name="custom_payment_input"]').val(<?php echo $price ?>);
-</script>
+<script>jQuery('[name="custom_payment_input"]').val(<?php echo $price ?>)</script>

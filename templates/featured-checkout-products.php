@@ -3,15 +3,20 @@
 if ( !isset( $_SESSION['featured_products']) ) return;
 $featured_products = $_SESSION['featured_products'];
 
-var_dump($featured_products);
 
-?>
+$pricing = get_featured_category_pricing();
 
+array_walk($featured_products, function(&$item) use($pricing) {
+    $price = absint($item['sub']) > 0 ? $pricing['sub'] : $pricing['main'];
 
-    <?php echo do_shortcode('[wppayform id="81"]'); ?>
-<form metho="POST">
-    <?php wp_nonce_field( 'memarjana', 'payment_success'); ?>
+    $item['price'] = $item['days'] * $price;
+});
 
-    <div class="gap-10"></div>
-    <button>Test Submit</button>
-</form>
+$total_price = array_sum(array_column($featured_products, 'price')); ?>
+
+<h2>Total Cost: $<?php echo $total_price; ?></h2>
+<div class="gap-10"></div>
+<?php echo do_shortcode('[wppayform id="81"]'); ?>
+
+<script>jQuery('[name="custom_payment_input"]').val(<?php echo $total_price ?>)</script>
+    

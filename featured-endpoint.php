@@ -54,9 +54,10 @@ class WCFM_Multivendor_Featured_Endpoint {
         error_log(print_r($submission, true));
 
         if ( isset($_SESSION['featured_products']) ) {
-            update_user_meta( get_current_user_id(), 'featured_products', $_SESSION['featured_products'] );
+            $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
+            $featured_products = array_merge($featured_products, $_SESSION['featured_products']);
+            update_user_meta( get_current_user_id(), 'featured_products', $featured_products );
         }
-
 
         if ( isset($_SESSION['featured_vendor']) ) {
             update_user_meta( get_current_user_id(), 'featured_vendor', $_SESSION['featured_vendor'] );
