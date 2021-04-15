@@ -9,11 +9,7 @@
  * @version   3.5.0
  */
 
-global $WCFM, $featured_error; 
-
-$store_featured = get_user_meta(get_current_user_id(  ), 'store_feature_info', true );
-
-?>
+global $WCFM, $WCFMmp; ?>
 
 <div class="collapse wcfm-collapse" id="wcfm_shop_listing">
     <div class="wcfm-page-headig">
