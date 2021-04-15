@@ -35,7 +35,7 @@
         <div class="wcfm_clearfix"></div>
 
         <?php
-        $featured_vendor_price = wcfm_get_option( 'featured_vendor_price' );
+        $featured_pricing = wcfm_get_option( 'wcfm_featured_pricing' );
         $WCFM->wcfm_fields->wcfm_generate_form_field(array(
             "wcfm_featured_pricing[vendor]" => array(
                 'label' => __('Price Per Day', 'wc-multivendor-featured') , 
@@ -43,7 +43,7 @@
                 'class' => 'wcfm-text wcfm_ele', 
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $featured_vendor_price, 
+                'value' => $featured_pricing['vendor'], 
                 'desc' => __('Price per day for featured store', 'wc-multivendor-featured'), 
                 ),
         ) ); ?>
@@ -62,7 +62,7 @@
                 'class' => 'wcfm-text wcfm_ele', 
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $category_pricing['main'], 
+                'value' => $featured_pricing['category'], 
                 'desc' => __('Price per day for main category', 'wc-multivendor-featured'), 
                 ),
         ) );        
@@ -74,7 +74,7 @@
                 'class' => 'wcfm-text wcfm_ele', 
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $category_pricing['sub'], 
+                'value' => $featured_pricing['sub_category'], 
                 'desc' => __('Price per day for sub category', 'wc-multivendor-featured'), 
                 ),
         ) );

@@ -30,7 +30,7 @@ global $WCFM; ?>
                     $payment_form = absint( wcfm_get_option( 'wc_featured_payment_form' ) );
 
                     if ( $payment_form == 0 ) {
-                        echo '<h3>Please contact with administrator.</h3>';
+                        echo '<h3>Please contact with administrator. Form is not activated.</h3>';
                     } else {
                         if ( isset($_SESSION['featured_vendor']) && is_object($_SESSION['featured_vendor']) ) {
                             include_once 'featured-checkout-vendor.php';
