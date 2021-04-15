@@ -98,3 +98,20 @@ table.table-featured-products tfoot {
 }
 
 table.table-featured-products tfoot tr td:last-child {text-align: left;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* REMOVE LATER */
+#wcfmmp-stores-lists {
+    max-width: 90%;
+}

@@ -56,22 +56,23 @@ class WCFM_Multivendor_Featured_Endpoint {
     }
 
     function featured_info_payment_successfull($submission) {
-        error_log(print_r($submission, true));
+        $current_form = $_SESSION['wcfm_featured_form'];        
 
-        if ( isset($_SESSION['featured_products']) ) {
+        if ( 'featured_products' == $current_form && isset($_SESSION['featured_products']) ) {
             $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
             $featured_products = array_merge($featured_products, $_SESSION['featured_products']);
             update_user_meta( get_current_user_id(), 'featured_products', $featured_products );
             unset($_SESSION['featured_products']);
         }
 
-        if ( isset($_SESSION['featured_vendor']) ) {
+        if ( 'featured_vendor' == $current_form && isset($_SESSION['featured_vendor']) ) {
             update_user_meta( get_current_user_id(), 'featured_vendor', $_SESSION['featured_vendor'] );
             unset($_SESSION['featured_vendor']);
         }
 
         if ( isset($_REQUEST['wpf_action']) && $_REQUEST['wpf_action'] == 'stripe_hosted_success' ) {
-            wp_safe_redirect(get_wcfm_vendor_featured_url()); 
+            wp_safe_redirect(get_wcfm_vendor_featured_url());
+            unset($_SESSION['wcfm_featured_form']);
             exit;
         }        
     }
@@ -97,9 +98,10 @@ class WCFM_Multivendor_Featured_Endpoint {
         if ( !empty($featured_error->errors) ) {
             return;
         }
-
+        
         unset($_SESSION['featured_products']);
 
+        $_SESSION['wcfm_featured_form'] = 'featured_vendor';
         $_SESSION['featured_vendor'] = (object) array(
             'start_date' => $_POST['wcfm_featured_store_start_date'],
             'days' => $_POST['wcfm_featured_store_days'],
@@ -117,6 +119,7 @@ class WCFM_Multivendor_Featured_Endpoint {
 
         unset($_SESSION['featured_vendor']);
 
+        $_SESSION['wcfm_featured_form'] = 'featured_products';
         $_SESSION['featured_products'] = $_POST['featured_products'];
 
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
