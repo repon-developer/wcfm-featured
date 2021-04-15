@@ -2,7 +2,11 @@
 if ( !isset($_SESSION['featured_products']) || !is_array($_SESSION['featured_products']) ) return;
 
 $featured_products = get_wcfm_featured_products((array) $_SESSION['featured_products']);
-$total_price = array_sum(array_column($featured_products, 'price')); ?>
+$total_price = array_sum(array_column($featured_products, 'price'));
+
+if ( $total_price <= 0 ) {
+    return;
+} ?>
 
 <table class="table-featured-products">
     <caption>Your Featured Products</caption>

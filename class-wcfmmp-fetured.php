@@ -70,12 +70,9 @@ class WCFM_Multivendor_Featured {
 	function featured_pricing_update($wcfm_settings_form) {
 
         wcfm_update_option( 'wc_featured_payment_form', $wcfm_settings_form['wc_featured_payment_form'] );
+		wcfm_update_option( 'wcfm_featured_pricing', $wcfm_settings_form['wcfm_featured_pricing'] );
 
-		$featured_store_price = number_format( $wcfm_settings_form['featured_store_price'], 2 );
-		wcfm_update_option( 'featured_store_price', 	$featured_store_price );
-
-		$featured_product_price = number_format ( $wcfm_settings_form['featured_product_price'], 2 );
-		wcfm_update_option( 'featured_product_price', 	$featured_product_price );
+		//$featured_product_price = number_format ( $wcfm_settings_form['featured_product_price'], 2 );
 	}   
 }
 

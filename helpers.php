@@ -1,8 +1,15 @@
 <?php
 
 function get_wcfm_featured_pricing() {
-    $pricing = wp_parse_args(wcfm_get_option( 'featured_category_pricing' ), ['vendor' => 4.99, 'category' => 2.99, 'sub_category' => 2.29]);
-    $pricing = array_merge($pricing, ['vendor' => wcfm_get_option( 'featured_vendor_price', 4.99 )]);
+    $pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_pricing' ), ['vendor' => 4.99, 'category' => 2.99, 'sub_category' => 2.29]);
+    array_walk($pricing, function(&$price){
+        if ( !$price) {
+            $price = 0;
+        }
+
+        $price = number_format($price, 2);
+    });
+
     return $pricing;
 }
 
