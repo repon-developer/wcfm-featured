@@ -28,17 +28,3 @@ add_action( 'wcfmmp_loaded', function(){
 	require_once( 'class-wcfmmp-fetured.php' );
 	$GLOBALS['WCFM_Multivendor_Featured'] = new WCFM_Multivendor_Featured();
 });
-
-
-add_action( 'init', function(){
-
-	if ( !isset($_GET['dev'])) return;
-
-	var_dump($_SESSION);
-
-	
-	
-	exit;
-
-
-});

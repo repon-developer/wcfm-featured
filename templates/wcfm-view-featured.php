@@ -25,7 +25,6 @@ $store_featured = get_user_meta(get_current_user_id(  ), 'store_feature_info', t
         <div class="wcfm-container wcfm-top-element-container">
             <h2><?php _e( 'Store & Product Featured Settings', 'wc-multivendor-featured' ); ?></h2>
         </div>
-
         <div class="gap-30"></div>
         <div id="wc-multivendor-featured"></div>
     </div>

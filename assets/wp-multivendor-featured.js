@@ -40,9 +40,6 @@ const FeatureVendorAdd = (props) => {
         category: ''
     });
 
-    const price = parseFloat(props.price);
-
-
     useEffect(() => {
         jQuery('.wc-multivendor-featured-datepicker').flatpickr({
             minDate: 'today'
@@ -89,7 +86,7 @@ const FeatureVendorAdd = (props) => {
                         <Categories name="wcfm_featured_store_category" category={category} onChange={(category) => setState({ ...state, category })} />
 
                         <label>Total Price</label>
-                        <span>${(days * wcfeatured.vendor_price).toFixed(2)}</span>
+                        <span>${(days * wcfeatured.pricing.vendor).toFixed(2)}</span>
                     </fieldset>
                     <div className="gap-60" />
                     <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
@@ -206,6 +203,11 @@ const FeaturedProductsAdd = (props) => {
 
     const on_submit = (e) => {
         let error = null;
+
+        if ( !products.length) {
+            e.preventDefault();
+            alert('Please add a product.')
+        }
 
         for (const key in products) {
             const product = products[key];
@@ -327,7 +329,7 @@ const MultivendorFeatured = () => {
     return (
         <React.Fragment>
             {typeof featured_vendor === 'object' && <VendorFeaturedInfo {...featured_vendor} />}
-            {featured_vendor == '' && <FeatureVendorAdd price={state.featured_vendor_price} _nonce={state.nonce_vendor_featured} />}
+            {featured_vendor == '' && <FeatureVendorAdd _nonce={state.nonce_vendor_featured} />}
 
             <FeaturedProducts products={vendor_featured_products} />
 

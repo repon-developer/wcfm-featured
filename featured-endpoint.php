@@ -56,11 +56,16 @@ class WCFM_Multivendor_Featured_Endpoint {
     }
 
     function featured_info_payment_successfull($submission) {
-        $current_form = $_SESSION['wcfm_featured_form'];        
+        $current_form = $_SESSION['wcfm_featured_form']; 
 
         if ( 'featured_products' == $current_form && isset($_SESSION['featured_products']) ) {
             $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
+            if ( !is_array($featured_products) ) {
+                $featured_products = [];
+            }
+
             $featured_products = array_merge($featured_products, $_SESSION['featured_products']);
+
             update_user_meta( get_current_user_id(), 'featured_products', $featured_products );
             unset($_SESSION['featured_products']);
         }
@@ -172,8 +177,7 @@ class WCFM_Multivendor_Featured_Endpoint {
         wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], null, true);
         wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
             'ajax' => admin_url( 'admin-ajax.php' ),
-            'pricing' => get_featured_category_pricing(),
-            'vendor_price' => get_featured_vendor_price(),
+            'pricing' => get_wcfm_featured_pricing(),
             'products' => get_posts( ['post_type' => 'product', 'author' => get_current_user_id()] ),
             'categories' => get_terms( 'product_cat', array('hide_empty' => false) )
         ]);

@@ -1,31 +1,7 @@
 <?php
+if ( !isset($_SESSION['featured_products']) || !is_array($_SESSION['featured_products']) ) return;
 
-if ( !isset( $_SESSION['featured_products']) ) return;
-$featured_products = $_SESSION['featured_products'];
-
-
-$pricing = get_featured_category_pricing();
-
-array_walk($featured_products, function(&$item) use($pricing) {
-    $price = absint($item['sub']) > 0 ? $pricing['sub'] : $pricing['main'];
-    $item['price'] = $item['days'] * $price;
-
-
-    $post = get_post( $item['id'] );
-        if ( $post instanceof WP_Post ) {
-            $item['post_title'] = $post->post_title;
-        }
-
-        $term_id = absint($item['sub']) > 0 ? $item['sub'] : $item['category'];
-
-        $term = get_term($term_id, 'product_cat');
-        if ( !is_wp_error( $term )) {
-            $item['term_name'] = $term->name;
-        }
-
-
-});
-
+$featured_products = get_wcfm_featured_products((array) $_SESSION['featured_products']);
 $total_price = array_sum(array_column($featured_products, 'price')); ?>
 
 <table class="table-featured-products">

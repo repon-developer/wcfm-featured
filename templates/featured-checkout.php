@@ -34,9 +34,7 @@ global $WCFM; ?>
 
                     if ( isset($_SESSION['featured_products']) && is_array($_SESSION['featured_products']) ) {
                         include_once 'featured-checkout-products.php';
-                    } ?>
-
-                
+                    } ?>                
             </div>
         </div>
     </div>
