@@ -69,6 +69,8 @@ class WCFM_Multivendor_Featured {
 
 	function featured_pricing_update($wcfm_settings_form) {
 
+        wcfm_update_option( 'wc_featured_payment_form', $wcfm_settings_form['wc_featured_payment_form'] );
+
 		$featured_store_price = number_format( $wcfm_settings_form['featured_store_price'], 2 );
 		wcfm_update_option( 'featured_store_price', 	$featured_store_price );
 

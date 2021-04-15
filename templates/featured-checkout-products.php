@@ -37,5 +37,5 @@ $total_price = array_sum(array_column($featured_products, 'price')); ?>
         </tr>
     </tfoot>
 </table>
-<?php echo do_shortcode('[wppayform id="81"]'); ?>
+<?php echo do_shortcode(sprintf('[wppayform id="%d"]', $payment_form)); ?>
 <script>jQuery('[name="custom_payment_input"]').val(<?php echo $total_price ?>)</script>

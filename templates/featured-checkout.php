@@ -27,14 +27,20 @@ global $WCFM; ?>
             <div class="wcfm-content">
 
                 <?php 
-                    if ( isset($_SESSION['featured_vendor']) && is_object($_SESSION['featured_vendor']) ) {
-                        include_once 'featured-checkout-vendor.php';
-                    }
-                
+                    $payment_form = absint( wcfm_get_option( 'wc_featured_payment_form' ) );
 
-                    if ( isset($_SESSION['featured_products']) && is_array($_SESSION['featured_products']) ) {
-                        include_once 'featured-checkout-products.php';
-                    } ?>                
+                    if ( $payment_form == 0 ) {
+                        echo '<h3>Please contact with administrator.</h3>';
+                    } else {
+                        if ( isset($_SESSION['featured_vendor']) && is_object($_SESSION['featured_vendor']) ) {
+                            include_once 'featured-checkout-vendor.php';
+                        }
+                    
+    
+                        if ( isset($_SESSION['featured_products']) && is_array($_SESSION['featured_products']) ) {
+                            include_once 'featured-checkout-products.php';
+                        }
+                    } ?>
             </div>
         </div>
     </div>
