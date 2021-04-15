@@ -2,7 +2,7 @@
 
 if ( !isset( $_SESSION['featured_vendor']) ) return;
 $vendor_featured = $_SESSION['featured_vendor'];
-$price = $vendor_featured->days * get_wcfm_featured_pricing()['vendor'];
+$price = $_SESSION['wcfm_featured_price'];
 
 if ( $price <= 0 ) {
     return;

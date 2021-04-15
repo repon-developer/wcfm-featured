@@ -53,6 +53,14 @@ class WCFM_Multivendor_Featured_Endpoint {
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
 
         //$this->featured_info_payment_successfull('');
+
+        //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
+    }
+
+    function secured_wcfeatured_price($submission) {
+        $submission['payment_total'] = $_SESSION['wcfm_featured_price'] * 100;
+        error_log($submission['payment_total']);
+        return $submission;
     }
 
     function featured_info_payment_successfull($submission) {
@@ -106,12 +114,15 @@ class WCFM_Multivendor_Featured_Endpoint {
         
         unset($_SESSION['featured_products']);
 
-        $_SESSION['wcfm_featured_form'] = 'featured_vendor';
-        $_SESSION['featured_vendor'] = (object) array(
+        $featured_vendor = (object) array(
             'start_date' => $_POST['wcfm_featured_store_start_date'],
             'days' => $_POST['wcfm_featured_store_days'],
             'category' => $_POST['wcfm_featured_store_category'],
         );
+        $_SESSION['featured_vendor'] = $featured_vendor;
+        
+        $_SESSION['wcfm_featured_form'] = 'featured_vendor';
+        $_SESSION['wcfm_featured_price'] = $featured_vendor->days * get_wcfm_featured_pricing()['vendor'];
 
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
@@ -123,9 +134,11 @@ class WCFM_Multivendor_Featured_Endpoint {
         }
 
         unset($_SESSION['featured_vendor']);
+        $featured_products = get_wcfm_featured_products((array) $_POST['featured_products']);
 
+        $_SESSION['featured_products'] = $featured_products;
         $_SESSION['wcfm_featured_form'] = 'featured_products';
-        $_SESSION['featured_products'] = $_POST['featured_products'];
+        $_SESSION['wcfm_featured_price'] = array_sum(array_column($featured_products, 'price'));
 
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
