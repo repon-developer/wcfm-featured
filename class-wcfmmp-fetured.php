@@ -25,6 +25,9 @@ class WCFM_Multivendor_Featured {
 
         include_once 'featured-cron.php';
         $this->cron = new WCFM_Multivendor_Featured_Cron();
+
+        include_once 'shortcodes.php';
+        $this->endpoints = new WCFM_Multivendor_Featured_Shortcodes();
         
         include_once 'featured-endpoint.php';
         $this->endpoints = new WCFM_Multivendor_Featured_Endpoint();
@@ -68,11 +71,8 @@ class WCFM_Multivendor_Featured {
 	}
 
 	function featured_pricing_update($wcfm_settings_form) {
-
         wcfm_update_option( 'wc_featured_payment_form', $wcfm_settings_form['wc_featured_payment_form'] );
 		wcfm_update_option( 'wcfm_featured_pricing', $wcfm_settings_form['wcfm_featured_pricing'] );
-
-		//$featured_product_price = number_format ( $wcfm_settings_form['featured_product_price'], 2 );
 	}   
 }
 

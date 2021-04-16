@@ -54,9 +54,9 @@ class WCFM_Multivendor_Featured_Cron {
 	}
 
 	function update_products($meta_id, $object_id, $meta_key, $featured_products) {
-		if ( !defined( 'DOING_CRON' ) ) {
-			return;
-		}
+		// if ( !defined( 'DOING_CRON' ) ) {
+		// 	return;
+		// }
 
 		if ( 'featured_products' !== $meta_key) {
 			return;

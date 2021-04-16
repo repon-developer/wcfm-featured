@@ -28,3 +28,17 @@ add_action( 'wcfmmp_loaded', function(){
 	require_once( 'class-wcfmmp-fetured.php' );
 	$GLOBALS['WCFM_Multivendor_Featured'] = new WCFM_Multivendor_Featured();
 });
+
+
+add_action( 'init', function(){
+	if ( !isset($_GET['dev']) ) return;
+
+	
+	do_action( 'clear_featured_data');
+	
+	$crons = wp_get_ready_cron_jobs();
+	foreach ($crons as $key => $value) {
+		var_dump($value);
+	}
+	exit;
+});

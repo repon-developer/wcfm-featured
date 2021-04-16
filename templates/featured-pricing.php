@@ -11,7 +11,7 @@
         <?php
 
             $form_options[0] = __('Select a form');
-            $payforms = get_posts( ['post_type' => 'wp_payform'] );
+            $payforms = get_posts( ['post_type' => 'wp_payform', 'posts_per_page' => -1] );
             while ($f = current($payforms)) {
                 next($payforms);
                 $form_options[$f->ID] = $f->post_title;

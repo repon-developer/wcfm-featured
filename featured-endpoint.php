@@ -191,7 +191,7 @@ class WCFM_Multivendor_Featured_Endpoint {
         wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
             'ajax' => admin_url( 'admin-ajax.php' ),
             'pricing' => get_wcfm_featured_pricing(),
-            'products' => get_posts( ['post_type' => 'product', 'author' => get_current_user_id()] ),
+            'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
             'categories' => get_terms( 'product_cat', array('hide_empty' => false) )
         ]);
     }

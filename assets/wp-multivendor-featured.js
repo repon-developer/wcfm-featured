@@ -159,7 +159,7 @@ const ProductItem = (props) => {
             <label>Product</label>
             <select defaultValue={product.id} name={`featured_products[${props.number}][id]`} className="wcfm-select" onChange={(e) => update({ ...product, id: e.target.value })} >
                 <option value="">Select a product</option>
-                {products.map((product) => {
+                {Array.isArray(products) && products.map((product) => {
                     return <option value={product.ID}>{product.post_title}</option>
                 })}
             </select>
