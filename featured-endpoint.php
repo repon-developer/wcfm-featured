@@ -150,7 +150,7 @@ class WCFM_Multivendor_Featured_Endpoint {
             'label' => 'Featured',
             'url' => get_wcfm_vendor_featured_url(),
             'icon' => 'star',
-            'priority' => 3
+            'priority' => 5
         ) );
 
         $menus = array_merge( $menus, $featured_menus );

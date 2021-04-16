@@ -15,6 +15,7 @@ class WCFM_Multivendor_Featured {
         $this->load();
         add_action( 'wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action( 'wp_ajax_get_featured_data', [$this, 'get_featured_data']);
+        add_action( 'wp_ajax_nopriv_get_featured_data', [$this, 'get_featured_data']);
 
         add_action( 'begin_wcfm_settings_form_style', 	array($this, 'featured_pricing'), 14);
 		add_action( 'wcfm_settings_update', 			array($this, 'featured_pricing_update'), 14);
