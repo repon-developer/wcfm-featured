@@ -17,7 +17,7 @@ class WCFM_Multivendor_Featured_Shortcodes {
 
         add_filter( "shortcode_atts_products", [$this, 'support_default_shortcode_attr'], 34, 4);
         add_filter( "wcfmmp_stores_default_args", function($atts){
-            $atts['wcfm_featured'] = '';
+            $atts['wcfm_featured'] = false;
             return $atts;
         });
     }
@@ -32,10 +32,10 @@ class WCFM_Multivendor_Featured_Shortcodes {
     }
 
     function wcfm_featured_stores($query_data, $atts) {        
-        if ( !isset($atts['wcfm_featured']) ) {
+        if ( $atts['wcfm_featured'] === false ) {
             return $query_data;
         }
-            
+                   
         $disabled = ['search', 'filter', 'has_orderby', 'map'];
         while ($key = current($disabled)) {
             next($disabled);
