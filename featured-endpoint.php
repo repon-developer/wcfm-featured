@@ -64,7 +64,9 @@ class WCFM_Multivendor_Featured_Endpoint {
     }
 
     function featured_info_payment_successfull($submission) {
-        $current_form = $_SESSION['wcfm_featured_form']; 
+        $current_form = $_SESSION['wcfm_featured_form'];
+
+        //$vendor_featured_data
 
         if ( 'featured_products' == $current_form && isset($_SESSION['featured_products']) ) {
             $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
@@ -96,21 +98,6 @@ class WCFM_Multivendor_Featured_Endpoint {
         }
 
         $days = absint($_POST['wcfm_featured_store_days']);
-
-        
-        $featured_error = new WP_Error();
-
-        if ( empty($_POST['wcfm_featured_store_start_date']) ) {
-            $featured_error->add('start_date', "Start date is not valid date value");
-        }
-
-        if ( $days == 0) {
-            $featured_error->add('days', "Days should be large than 0");
-        }
-
-        if ( !empty($featured_error->errors) ) {
-            return;
-        }
         
         unset($_SESSION['featured_products']);
 

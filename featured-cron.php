@@ -34,41 +34,62 @@ class WCFM_Multivendor_Featured_Cron {
 
 		while ($user = current($users)) {
 			next($users);
-			$featured_products = get_user_meta( $user->ID, 'featured_products', true);
-
-			$featured_products = array_filter($featured_products, function($product) {
-				$expire_time = strtotime(sprintf("%s + %d days", $product['start'], $product['days']));				
-				delete_post_meta($product['id'], 'wcfm_featured');
-				return $expire_time > strtotime('now');
-			});
-		
-			update_user_meta($user->ID, 'featured_products',  $featured_products);
 
 			$featured_vendor = get_user_meta( $user->ID, 'featured_vendor', true);
-			$expire_time = strtotime(sprintf("%s + %d days", $featured_vendor->start_date, $featured_vendor->days));
+			
+			$start_time = strtotime($featured_vendor->start_date);
+			$expire_time = $start_time + ($featured_vendor->days * DAY_IN_SECONDS);
 
-			if ($expire_time < strtotime('now')) {
-				delete_user_meta($user->ID, 'featured_vendor');
-			}
+			
+			if (is_a($featured_vendor, 'stdClass')) {
+				if (strtotime($start_time) <= strtotime('now') ) {
+					update_user_meta( $user->ID, 'wcfm_featured_category', $featured_vendor->category);
+				}
+				
+				if ($expire_time < strtotime('now')) {
+					delete_user_meta($user->ID, 'featured_vendor');
+					delete_user_meta($user->ID, 'wcfm_featured_category');
+				}
+			}			
+
+			$featured_products = get_user_meta( $user->ID, 'featured_products', true);
+
+			if ( !is_array($featured_products) ) continue;
+
+			$featured_products = array_filter($featured_products, function($product) {
+				$expire_time = strtotime(sprintf("%s + %d days", $product['start'], $product['days']));	
+				if ( $expire_time <= strtotime('now') ) {
+					delete_post_meta($product['id'], 'wcfm_featured');
+				}
+				
+				return $expire_time > strtotime('now');
+			});
+
+			update_user_meta($user->ID, 'featured_products',  $featured_products);
+			$this->update_products($featured_products);
+
+			if ( empty($featured_products) ) {
+				delete_user_meta($user->ID, 'featured_products');
+			}		
 		}
 	}
 
-	function update_products($meta_id, $object_id, $meta_key, $featured_products) {
-		// if ( !defined( 'DOING_CRON' ) ) {
-		// 	return;
-		// }
-
-		if ( 'featured_products' !== $meta_key) {
-			return;
-		}
+	function update_products($featured_products) {
+		if (!is_array($featured_products)) return;
 
 		while ($product = current($featured_products)) {
-			next($featured_products);
-			
+			next($featured_products);			
+			if ( strtotime($product['start']) > strtotime('now') ) {
+				continue;
+			}
+
 			$category = !empty($product['sub']) ? $product['sub'] : $product['category'];
 			update_post_meta( $product['id'], 'wcfm_featured', $category);
 		}
 	}
-	
 }
 
+add_action( 'initt', function(){
+	do_action( 'clear_featured_data' );
+	exit;
+});
