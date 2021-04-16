@@ -13,7 +13,7 @@ function get_wcfm_featured_pricing() {
     return $pricing;
 }
 
-function get_wcfm_featured_products($products = false) {    
+function get_wcfm_featured_products($products = false) {
     if ( !is_array($products) ) {
         $products = get_user_meta( get_current_user_id(), 'featured_products', true);
     }    
@@ -37,7 +37,9 @@ function get_wcfm_featured_products($products = false) {
 
         $price = absint($item['sub']) > 0 ? $pricing['sub_category'] : $pricing['category'];
         $item['price'] = $item['days'] * $price;
-    });
 
+        $item['expire_on'] = date('Y-m-d H:i:s', strtotime($item['start']) + ($item['days'] * DAY_IN_SECONDS));
+    });
+    
     return $products;
 }
