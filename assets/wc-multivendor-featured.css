@@ -7,6 +7,8 @@
 
 .wcfm-vendor-featured-form:before, .wcfm-vendor-featured-form:after {content: ""; display: block; clear: both; height: 0;}
 
+#wcfm-content {border: none!important;}
+
 #wcfm-main-contentainer fieldset.wcfm-vendor-featured-fieldset {
     clear: both;
     position: relative;
