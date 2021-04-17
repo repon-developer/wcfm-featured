@@ -66,19 +66,18 @@ class WCFM_Multivendor_Featured_Shortcodes {
             return $query_args;
         }
 
-        $query_args['meta_key'] = 'wcfm_featured'; 
-        $query_args['meta_compare'] = 'EXISTS'; 
-
+        $query_args['meta_query'] = array(array( 'key' => 'wcfm_featured', 'compare' => 'EXISTS' ));
         if (empty($attributes['wcfm_featured'])) {
             return $query_args;
-        }        
+        }
+        
 
         $term = get_term_by('slug', $attributes['wcfm_featured'], 'product_cat');
         if ( !is_a($term, 'WP_Term') ) {
             return $query_args;
         }
-        
-        $query_args['meta_value'] = $term->term_id;        
+
+        $query_args['meta_query'] = array(array( 'key' => 'wcfm_featured', 'value' => $term->term_id ));
         return $query_args;
     }
 }
