@@ -1,7 +1,6 @@
 <?php
+if ( !isset( $_SESSION['wcfm_feature_vendor']) ) return;
 
-if ( !isset( $_SESSION['featured_vendor']) ) return;
-$vendor_featured = $_SESSION['featured_vendor'];
 $price = $_SESSION['wcfm_featured_price'];
 
 if ( $price <= 0 ) {

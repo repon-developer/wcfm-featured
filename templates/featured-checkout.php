@@ -19,7 +19,7 @@ global $WCFM; ?>
     </div>
     <div class="wcfm-collapse-content">
         <div class="wcfm-container wcfm-top-element-container">
-            <h2><?php _e( 'Store & Product Featured Settings', 'wc-multivendor-featured' ); ?></h2>
+            <h2><?php _e( 'Store & Product Feature Settings', 'wc-multivendor-featured' ); ?></h2>
         </div>
 
         <div class="gap-30"></div>
@@ -28,14 +28,12 @@ global $WCFM; ?>
 
                 <?php 
                     $payment_form = absint( wcfm_get_option( 'wc_featured_payment_form' ) );
-
                     if ( $payment_form == 0 ) {
                         echo '<h3>Please contact with administrator. Form is not activated.</h3>';
                     } else {
-                        if ( isset($_SESSION['featured_vendor']) && is_object($_SESSION['featured_vendor']) ) {
+                        if ( isset($_SESSION['wcfm_feature_vendor']) && is_array($_SESSION['wcfm_feature_vendor']) ) {
                             include_once 'featured-checkout-vendor.php';
-                        }
-                    
+                        }                    
     
                         if ( isset($_SESSION['featured_products']) && is_array($_SESSION['featured_products']) ) {
                             include_once 'featured-checkout-products.php';

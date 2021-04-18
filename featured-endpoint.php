@@ -33,10 +33,11 @@ class WCFM_Multivendor_Featured_Endpoint {
             return;
         }
 
+        
         if (!session_id() ) {
             session_start();
         }
-
+        
         add_filter( 'wcfm_query_vars', array( &$this, 'featured_wcfm_query_vars' ), 20 );
         add_action( 'init', array( &$this, 'featured_wcfm_init' ), 20 );
         add_filter( 'wcfm_menus', array( &$this, 'featured_wcfm_menus' ), 20 );
@@ -44,16 +45,14 @@ class WCFM_Multivendor_Featured_Endpoint {
         add_action( 'wcfm_load_scripts', array( &$this, 'wcfm_customers_load_scripts' ), 30 ); 
         add_action( 'wcfm_load_views', array( &$this, 'wcfm_customers_load_views' ), 30 );
 
-        add_action( 'init', [$this, 'store_featured_before_payment']);
+        add_action( 'init', [$this, 'create_session_for_vendor']);
         add_action( 'init', [$this, 'products_featured_before_payment']);
 
         add_filter( 'script_loader_tag', [$this, 'enqueue_babel_script'], 10, 3 ); 
 
         //fire event after successful payment
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
-
         //$this->featured_info_payment_successfull('');
-
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
     }
 
@@ -63,53 +62,71 @@ class WCFM_Multivendor_Featured_Endpoint {
         return $submission;
     }
 
-    function featured_info_payment_successfull($submission) {
-        $current_form = $_SESSION['wcfm_featured_form'];
+    function featured_info_payment_successfull($submission) {     
+        $current_form = $_SESSION['wcfm_featured_current_form'];
+        $this->save_feature_data_vendor($current_form);
+        $this->save_feature_data_products($current_form);
+        exit;
 
-        //$vendor_featured_data
-
-        if ( 'featured_products' == $current_form && isset($_SESSION['featured_products']) ) {
-            $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
-            if ( !is_array($featured_products) ) {
-                $featured_products = [];
-            }
-
-            $featured_products = array_merge($featured_products, $_SESSION['featured_products']);
-
-            update_user_meta( get_current_user_id(), 'featured_products', $featured_products );
-            unset($_SESSION['featured_products']);
-        }
-
-        if ( 'featured_vendor' == $current_form && isset($_SESSION['featured_vendor']) ) {
-            update_user_meta( get_current_user_id(), 'featured_vendor', $_SESSION['featured_vendor'] );
-            unset($_SESSION['featured_vendor']);
-        }
+        unset($_SESSION['wcfm_featured_price']);
+        unset($_SESSION['wcfm_featured_current_form']);
 
         if ( isset($_REQUEST['wpf_action']) && $_REQUEST['wpf_action'] == 'stripe_hosted_success' ) {
             wp_safe_redirect(get_wcfm_vendor_featured_url());
-            unset($_SESSION['wcfm_featured_form']);
             exit;
         }        
     }
 
-    function store_featured_before_payment() {
+    function save_feature_data_vendor($current_form) {
+        if ( $current_form !== 'wcfm_feature_vendor') return;
+        $wcfm_feature_table = get_wcfm_feature_table();
+
+        $rows = [];
+        $user_id = get_current_user_id(  );
+        $category = $_SESSION['wcfm_feature_vendor']['category'];
+
+        foreach ($_SESSION['wcfm_feature_vendor']['dates'] as $date) {
+            $rows[] = $wpdb->prepare("(%d, %d, %s)", $user_id, $category, $date);
+        }
+
+        $wpdb->query(sprintf("INSERT INTO $wcfm_feature_table (user_id, term_id, feature_date) VALUES %s", implode( ",\n", $rows )));
+        unset($_SESSION['wcfm_feature_vendor']);
+    }
+
+    function save_feature_data_products($current_form) {
+        if ( $current_form !== 'wcfm_feature_vendor') return;
+
+        //get_wcfm_feature_table()
+
+        exit;
+
+        $featured_products = get_user_meta( get_current_user_id(), 'featured_products', true);
+        if ( !is_array($featured_products) ) {
+            $featured_products = [];
+        }
+
+        $featured_products = array_merge($featured_products, $_SESSION['featured_products']);
+
+        update_user_meta( get_current_user_id(), 'featured_products', $featured_products );
+        unset($_SESSION['featured_products']);
+    }
+
+
+    function create_session_for_vendor() {
         if (!wp_verify_nonce($_POST['_nonce_featured_vendor'], 'vendor_featured') ) {
             return;
         }
 
-        $days = absint($_POST['wcfm_featured_store_days']);
-        
-        unset($_SESSION['featured_products']);
 
-        $featured_vendor = (object) array(
-            'start_date' => $_POST['wcfm_featured_store_start_date'],
-            'days' => $_POST['wcfm_featured_store_days'],
-            'category' => $_POST['wcfm_featured_store_category'],
-        );
-        $_SESSION['featured_vendor'] = $featured_vendor;
-        
-        $_SESSION['wcfm_featured_form'] = 'featured_vendor';
-        $_SESSION['wcfm_featured_price'] = $featured_vendor->days * get_wcfm_featured_pricing()['vendor'];
+        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_vendor';
+        $_SESSION['wcfm_featured_price'] = $_POST['price'];
+
+        $feature_dates = is_array($_POST['feature_dates']) ? $_POST['feature_dates'] : [];
+        $wcfm_feature_vendor = array('category' => $_POST['feature_category'], 'dates' => $feature_dates);
+
+
+        $_SESSION['wcfm_feature_vendor'] = $wcfm_feature_vendor;
+
 
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
@@ -173,16 +190,25 @@ class WCFM_Multivendor_Featured_Endpoint {
 
     public function wcfm_customers_load_scripts( $end_point ) {
         if ( 'wcfm-featured' !== $end_point) return;
+        global $wpdb;
 
         $get_terms = get_terms( 'product_cat', array('hide_empty' => false) );
 
+        array_walk($get_terms, function(&$term){
+            $term->name = html_entity_decode($term->name);
+        });
 
-        $get_terms[] = array('name' => 'Repon & Hossan');
+        wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], filemtime(WCFM_FEATURED_PATH. 'assets/wp-multivendor-featured.js'), true);
 
-        wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], null, true);
+
+
+        $feature_table = get_wcfm_feature_table();
+        $unavailable_date_vendor = $wpdb->get_results("SELECT term_id, feature_date, COUNT(*) as total FROM $feature_table GROUP BY term_id, feature_date HAVING total >= 8");
+        
         wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
             'ajax' => admin_url( 'admin-ajax.php' ),
             'pricing' => get_wcfm_featured_pricing(),
+            'unavailable_dates_vendor' => $unavailable_date_vendor,
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
             'categories' => $get_terms
         ]);

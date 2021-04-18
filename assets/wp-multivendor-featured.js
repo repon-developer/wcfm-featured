@@ -1,5 +1,5 @@
 (function ($) {
-    $(".wc-multivendor-featured-datepicker").flatpickr({
+    $(".wc-multivendor-featured-daftepicker").flatpickr({
         minDate: 'today'
     });
 
@@ -8,7 +8,7 @@
 })(jQuery);
 
 const { useState, useEffect, useRef } = React;
-const { categories, products } = wcfeatured;
+const { categories, products, unavailable_dates_vendor } = wcfeatured;
 
 const main_category = categories.filter(cat => cat.parent == 0);
 
@@ -34,37 +34,52 @@ const Categories = ({ name, category, onChange }) => {
 }
 
 const FeatureVendorAdd = (props) => {
+    const datepicker = useRef(null);
+
     const [state, setState] = useState({
-        start_date: new Date().toISOString().slice(0, 10),
-        days: 1,
-        category: ''
+        category: '',
+        dates: [],
     });
 
-    useEffect(() => {
-        jQuery('.wc-multivendor-featured-datepicker').flatpickr({
-            minDate: 'today'
-        })
-    }, []);
+    const { dates, category } = state;
 
-    const { start_date, days, category } = state;
+    useEffect(() => {
+        const disable_dates = unavailable_dates_vendor.filter((date) => category == date.term_id).map((date) => date.feature_date);
+
+        jQuery(datepicker.current).flatpickr({
+            minDate: 'today',
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            defaultDate: state.dates,
+            disable: disable_dates,
+            onChange: (selectedDates, dates, instance) => {
+                dates = dates.split(',').map((date) => date.trim());
+                setState({...state, dates})
+            }
+        })
+    }, [category]);
 
     const onSubmit = (e) => {
-
-        if (!start_date.length) {
-            e.preventDefault();
-            return alert('Start date is not valid');
-        }
-
-        if (!Number.isInteger(parseInt(days))) {
-            e.preventDefault();
-            return alert('Days is not valid');
-        }
-
-        if (!state.category) {
+        if (!category.length) {
             e.preventDefault();
             return alert('Please select a category');
         }
+
+        if (dates.length == 0) {
+            e.preventDefault();
+            return alert('You have not selected any date.');
+        }
+
+
+        const _flatpickr = datepicker.current._flatpickr
+
+        if ( _flatpickr.selectedDates.length !== dates) {
+            e.preventDefault();
+            return alert('Please review selected dates again.')
+        }
     }
+
+    const price = Array.isArray(dates) ? (dates.length * wcfeatured.pricing.vendor).toFixed(2) : 0;
 
     return (
         <div className="wcfm-container" style={{ marginBottom: 40 }}>
@@ -75,18 +90,24 @@ const FeatureVendorAdd = (props) => {
                     <input type="hidden" name="_nonce_featured_vendor" value={props._nonce} />
 
                     <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid">
-                        <label>Start Date</label>
-                        <input name="wcfm_featured_store_start_date" defaultValue={start_date} type="text" className="wcfm-text wc-multivendor-featured-datepicker" />
-
-                        <label>Days</label>
-                        <input name="wcfm_featured_store_days" onChange={(e) => setState({ ...state, days: e.target.value })} type="text" className="wcfm-text" defaultValue={days} />
-
                         <label>Category</label>
+                        <Categories name="feature_category" category={category} onChange={(category) => setState({ ...state, category })} />
 
-                        <Categories name="wcfm_featured_store_category" category={category} onChange={(category) => setState({ ...state, category })} />
+                        <label>Date</label>
+                        <input ref={datepicker} type="text" className="wcfm-text" />
 
-                        <label>Total Price</label>
-                        <span>${(days * wcfeatured.pricing.vendor).toFixed(2)}</span>
+                        {(Array.isArray(dates) && dates.length > 0) && 
+                            <React.Fragment>
+                                {dates.map(date => <input type="hidden" name="feature_dates[]" value={date} />)}
+                                <label>Days</label>
+                                <span>{dates.length}</span>
+
+                                <label>Total Price</label>
+                                <span>${price}</span>
+                                <input type="hidden" name="price" value={price} />
+                            </React.Fragment>
+                        }
+                        
                     </fieldset>
                     <div className="gap-60" />
                     <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
@@ -325,8 +346,6 @@ const MultivendorFeatured = () => {
     }
 
     const { featured_vendor, vendor_featured_products, session_products } = state;
-
-    console.log(categories)
 
     return (
         <React.Fragment>
