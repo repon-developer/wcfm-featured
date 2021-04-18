@@ -174,12 +174,17 @@ class WCFM_Multivendor_Featured_Endpoint {
     public function wcfm_customers_load_scripts( $end_point ) {
         if ( 'wcfm-featured' !== $end_point) return;
 
+        $get_terms = get_terms( 'product_cat', array('hide_empty' => false) );
+
+
+        $get_terms[] = array('name' => 'Repon & Hossan');
+
         wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], null, true);
         wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
             'ajax' => admin_url( 'admin-ajax.php' ),
             'pricing' => get_wcfm_featured_pricing(),
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
-            'categories' => get_terms( 'product_cat', array('hide_empty' => false) )
+            'categories' => $get_terms
         ]);
     }
 

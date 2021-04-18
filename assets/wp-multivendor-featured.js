@@ -69,7 +69,7 @@ const FeatureVendorAdd = (props) => {
     return (
         <div className="wcfm-container" style={{ marginBottom: 40 }}>
             <div className="wcfm-content">
-                <h2>Featured your store</h2>
+                <h2>Feature your BLEX store</h2>
                 <div className="gap-10" />
                 <form className="wcfm-vendor-featured-form wcfm-vendor-featured-store-form" method="POST">
                     <input type="hidden" name="_nonce_featured_vendor" value={props._nonce} />
@@ -249,7 +249,7 @@ const FeaturedProductsAdd = (props) => {
     return (
         <div className="wcfm-container">
             <div className="wcfm-content">
-                <h2>Add your product at Featured list</h2>
+                <h2>Feature your Products</h2>
                 <div className="gap-20" />
                 <form className="wcfm-vendor-featured-form wcfm-vendor-featured-product-form" method="post">
                     <input type="hidden" name="_nonce_featured_products" value={props._nonce} />
@@ -257,7 +257,7 @@ const FeaturedProductsAdd = (props) => {
 
                     {products.map((p, index) => <ProductItem onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
 
-                    <span className="add-new-btn" onClick={add_feature_product}>Add Feature Product</span>
+                    <span className="add-new-btn" onClick={add_feature_product}>Add featured product</span>
 
                     <div className="gap-60" />
                     <button className="wcfm_submit_button" onClick={on_submit}>Activate Now</button>
@@ -325,6 +325,8 @@ const MultivendorFeatured = () => {
     }
 
     const { featured_vendor, vendor_featured_products, session_products } = state;
+
+    console.log(categories)
 
     return (
         <React.Fragment>

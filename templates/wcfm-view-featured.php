@@ -19,7 +19,7 @@ global $WCFM, $WCFMmp; ?>
     </div>
     <div class="wcfm-collapse-content">
         <div class="wcfm-container wcfm-top-element-container">
-            <h2><?php _e( 'Store & Product Featured Settings', 'wc-multivendor-featured' ); ?></h2>
+            <h2><?php _e( 'Store & Product Feature Settings', 'wc-multivendor-featured' ); ?></h2>
         </div>
         <div class="gap-30"></div>
         <div id="wc-multivendor-featured"></div>
