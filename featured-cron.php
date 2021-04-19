@@ -89,13 +89,12 @@ class WCFM_Multivendor_Featured_Cron {
 		$vendors_limit = 8;
 
 		$featured_dates = $wpdb->get_results(sprintf(
-			"SELECT * FROM %s WHERE object_id = %s AND feature_type = 'vendor' AND feature_date = DATE(NOW()) LIMIT %d", 
-			$feature_table, get_current_user_id(), $vendors_limit
+			"SELECT * FROM %s WHERE feature_type = 'vendor' AND feature_date = DATE(NOW()) LIMIT %d", 
+			$feature_table, $vendors_limit
 		));
 
 		while ( $date = current($featured_dates) ) {
 			next($featured_dates);
-			var_dump($date);
 			update_user_meta( $date->object_id, 'wcfm_featured', $date->term_id);
 		}
 	}
@@ -116,7 +115,7 @@ class WCFM_Multivendor_Featured_Cron {
 	}
 }
 
-add_action( 'init', function(){
+add_action( 'inits', function(){
 	do_action( 'clear_featured_data' );
 	exit;
 });

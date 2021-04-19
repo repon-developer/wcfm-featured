@@ -25,20 +25,20 @@ global $WCFM; ?>
         <div class="gap-30"></div>
         <div class="wcfm-container">
             <div class="wcfm-content">
+            <?php 
+                $payment_form = absint( wcfm_get_option( 'wc_featured_payment_form' ) );
+                if ( $payment_form == 0 ) {
+                    echo '<h3>Please contact with administrator. Form is not activated.</h3>';
+                } else {
+                    $current_form = $_SESSION['wcfm_featured_current_form'];
+                    if ( 'wcfm_feature_vendor' == $current_form ) {
+                        include_once 'featured-checkout-vendor.php';
+                    } 
 
-                <?php 
-                    $payment_form = absint( wcfm_get_option( 'wc_featured_payment_form' ) );
-                    if ( $payment_form == 0 ) {
-                        echo '<h3>Please contact with administrator. Form is not activated.</h3>';
-                    } else {
-                        if ( isset($_SESSION['wcfm_feature_vendor']) && is_array($_SESSION['wcfm_feature_vendor']) ) {
-                            include_once 'featured-checkout-vendor.php';
-                        }                    
-    
-                        if ( isset($_SESSION['featured_products']) && is_array($_SESSION['featured_products']) ) {
-                            include_once 'featured-checkout-products.php';
-                        }
-                    } ?>
+                    if ( 'wcfm_feature_products' == $current_form ) {
+                        include_once 'featured-checkout-products.php';
+                    }
+                } ?>
             </div>
         </div>
     </div>

@@ -32,6 +32,9 @@ class WCFM_Multivendor_Featured {
         
         include_once 'featured-endpoint.php';
         $this->endpoints = new WCFM_Multivendor_Featured_Endpoint();
+
+        include_once 'featured-payments.php';
+        $this->endpoints = new WCFM_Multivendor_Featured_Payments();
     }
 
     function enqueue_scripts() {
@@ -51,7 +54,7 @@ class WCFM_Multivendor_Featured {
         $feature_table = get_wcfm_feature_table();
 
         
-        $featured_dates = $wpdb->get_results(sprintf("SELECT term_id, feature_date FROM %s WHERE object_id = %s AND feature_type = 'vendor'", $feature_table, get_current_user_id()));
+        $featured_dates = $wpdb->get_results(sprintf("SELECT term_id, feature_date FROM %s WHERE vendor_id = %s", $feature_table, get_current_user_id()));
 
         array_walk($featured_dates, function(&$row) {
             $term = get_term($row->term_id, 'product_cat');
@@ -64,8 +67,8 @@ class WCFM_Multivendor_Featured {
             'featured_dates' => $featured_dates,
             'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
 
-            'vendor_featured_products' => get_wcfm_featured_products(),            
-            'session_products' => isset($_SESSION['featured_products']) ? $_SESSION['featured_products'] : [],
+            'vendor_products' => get_wcfm_feature_products(),
+            'session_products' => isset($_SESSION['wcfm_featured_products']) ? $_SESSION['wcfm_featured_products'] : [],
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
         ]);
 

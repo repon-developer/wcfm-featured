@@ -45,8 +45,7 @@ class WCFM_Multivendor_Featured_Shortcodes {
         $query_args = array(
             'role' => 'wcfm_vendor', 
             'offset' => $query_data['offset'],
-
-            'meta_key' => 'wcfm_featured_category'
+            'meta_key' => 'wcfm_featured'
         );
 
         if ( !empty($atts['wcfm_featured']) ) {
