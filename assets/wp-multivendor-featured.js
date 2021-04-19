@@ -162,11 +162,7 @@ const ProductItem = (props) => {
         }
     }
 
-    
-
     const childs = get_sub_categories(product.category);
-
-
 
     return (
         <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid wcfm-vendor-featured-fieldset-product-grid">
@@ -276,7 +272,7 @@ const FeaturedProducts = (props) => {
     const products = Object.values(props.products);
 
     const date_string = (dates) => {
-        return dates.map(date => moment(date).format('DD MMM, YYYY'))
+        return dates.map(date => moment(date).format('DD MMM'))
     }
 
     return (

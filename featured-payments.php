@@ -80,7 +80,7 @@ class WCFM_Multivendor_Featured_Payments {
         }
 
         $wpdb->query(sprintf("INSERT INTO $feature_products (product_id, term_id, sub_term, feature_date) VALUES %s", implode( ",\n", $products )));
-        unset($_SESSION['wcfm_feature_products']);
+        unset($_SESSION['wcfm_featured_products']);
     }
 
 

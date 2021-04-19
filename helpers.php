@@ -51,7 +51,10 @@ function wcfm_sanitize_session_products($products) {
         }
 
         $price = $is_sub_category ? $pricing['sub_category'] : $pricing['category'];
-        $product['price'] = sizeof($product['dates']) * $price;
+
+        if ( is_array($product['dates']) ) {
+            $product['price'] = sizeof($product['dates']) * $price;
+        }
     });
 
 
@@ -62,19 +65,43 @@ function get_wcfm_feature_products() {
     global $wpdb;
     $table = get_wcfm_feature_table('products');
 
-	$sql = sprintf("SELECT products.*, posts.post_author FROM $table products INNER JOIN $wpdb->posts posts ON products.product_id = posts.ID WHERE post_author = %d", get_current_user_id(  ));
+	$sql = sprintf("SELECT products.*, posts.post_author FROM $table products INNER JOIN $wpdb->posts posts ON products.product_id = posts.ID WHERE feature_date >= DATE(NOW()) AND post_author = %d ORDER BY feature_date", get_current_user_id(  ));
 
 	$vendor_products = $wpdb->get_results($sql, ARRAY_A);
 
-	$products = [];
-	while ($product = current($vendor_products)) {
-		next($vendor_products);
-		$id = $product['product_id'];
-		$products[$id]['id'] = $product['product_id'];
-		$products[$id]['category'] = $product['term_id'];
-		$products[$id]['sub_category'] = $product['sub_term'];
-		$products[$id]['dates'][] = $product['feature_date'];
+    array_walk($vendor_products, function(&$product) {
+        $product['id'] = $product['product_id'];
+        $product['category'] = $product['term_id'];
+        $product['sub_category'] = $product['sub_term'];
+
+        $product['target_term'] = $product['term_id'];
+        if ( absint( $product['sub_category'] ) > 0 ) {
+            $product['target_term'] = $product['sub_category'];
+        }
+
+        unset($product['ID'], $product['product_id']);
+    });
+
+    
+    $products = [];
+	while ($p = current($vendor_products)) {
+        next($vendor_products);
+
+		$key = $p['id'] . '-' . $p['target_term'];
+		$products[$key]['id'] = $p['id'];
+		$products[$key]['term'] = $p['target_term'];
+		$products[$key]['dates'][] = $p['feature_date'];
 	}
-	
-	return wcfm_sanitize_session_products($products);
+
+	$products = array_map(function($product) use ($vendor_products) {
+		reset($vendor_products);
+		$items = array_filter($vendor_products, function($p) use($product) {
+			return $p['id'] == $product['id'] && $p['target_term'] == $product['term'];
+		});
+
+		return array_merge(current($items), array('dates' => $product['dates']));
+	}, $products);
+
+
+    return wcfm_sanitize_session_products($products);
 }
