@@ -22,7 +22,7 @@ class WCFM_Multivendor_Featured_Payments {
 
         //fire event after successful payment
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
-        //$this->featured_info_payment_successfull('');
+        $this->featured_info_payment_successfull('');
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
     }
 
@@ -37,6 +37,8 @@ class WCFM_Multivendor_Featured_Payments {
         $this->save_feature_data_vendor($current_form);
         $this->save_feature_data_products($current_form);
 
+        exit;
+
         unset($_SESSION['wcfm_featured_price']);
         unset($_SESSION['wcfm_featured_current_form']);
 
@@ -50,13 +52,13 @@ class WCFM_Multivendor_Featured_Payments {
         global $wpdb;
         if ( $current_form !== 'wcfm_feature_vendor') return;
         $wcfm_feature_table = get_wcfm_feature_table();
-
+        
         $rows = [];
         $user_id = get_current_user_id(  );
         $category = $_SESSION['wcfm_feature_vendor']['category'];
-
+        
         foreach ($_SESSION['wcfm_feature_vendor']['dates'] as $date) {
-            $rows[] = $wpdb->prepare("(%d, %d, %s')", $user_id, $category, $date);
+            $rows[] = $wpdb->prepare("(%d, %d, %s)", $user_id, $category, $date);
         }
 
         $wpdb->query(sprintf("INSERT INTO $wcfm_feature_table (vendor_id, term_id, feature_date) VALUES %s", implode( ",\n", $rows )));
