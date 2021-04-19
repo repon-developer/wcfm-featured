@@ -47,19 +47,24 @@ class WCFM_Multivendor_Featured {
     }
 
     function get_featured_data() {
+        global $wpdb;
+        $feature_table = get_wcfm_feature_table();
 
-        $featured_vendor = get_user_meta( get_current_user_id(), 'featured_vendor', true);
+        
+        $featured_dates = $wpdb->get_results(sprintf("SELECT term_id, feature_date FROM %s WHERE object_id = %s AND feature_type = 'vendor'", $feature_table, get_current_user_id()));
 
-        if ( isset($featured_vendor->category) ) {
-            $term = get_term_by( 'id', $featured_vendor->category, 'product_cat');
-            $featured_vendor->category = $term->name;
-        }
+        array_walk($featured_dates, function(&$row) {
+            $term = get_term($row->term_id, 'product_cat');
+            if ( !is_wp_error( $term )) {
+                $row->term_name = html_entity_decode($term->name);
+            }
+        });
 
         wp_send_json([
-            'featured_vendor' => $featured_vendor,
+            'featured_dates' => $featured_dates,
             'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
 
-            'vendor_featured_products' => get_wcfm_featured_products(),
+            'vendor_featured_products' => get_wcfm_featured_products(),            
             'session_products' => isset($_SESSION['featured_products']) ? $_SESSION['featured_products'] : [],
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
         ]);

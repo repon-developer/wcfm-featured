@@ -10,6 +10,7 @@
 
 
 class WCFM_Multivendor_Featured_Cron {
+	var $users = [];
 
     function __construct() {
 		add_action( 'clear_featured_data', [$this, 'clear_featured_data']);
@@ -29,7 +30,10 @@ class WCFM_Multivendor_Featured_Cron {
     }
 
 	function clear_featured_data() {
-		$users = get_users(array('role' => 'wcfm_vendor'));
+		$this->users = get_users(array('role' => 'wcfm_vendor'));
+
+		$this->update_vendor_feature();
+		exit;
 
 
 		while ($user = current($users)) {
@@ -74,6 +78,29 @@ class WCFM_Multivendor_Featured_Cron {
 		}
 	}
 
+	function update_vendor_feature() {
+		global $wpdb;
+		$user_meta_table = $wpdb->prefix.'postmeta';
+		$wpdb->delete($user_meta_table, array('meta_key' => 'wcfm_featured'));
+
+
+		$feature_table = get_wcfm_feature_table();
+
+		$vendors_limit = 8;
+
+		$featured_dates = $wpdb->get_results(sprintf(
+			"SELECT * FROM %s WHERE object_id = %s AND feature_type = 'vendor' AND feature_date = DATE(NOW()) LIMIT %d", 
+			$feature_table, get_current_user_id(), $vendors_limit
+		));
+
+		while ( $date = current($featured_dates) ) {
+			next($featured_dates);
+			var_dump($date);
+			update_user_meta( $date->object_id, 'wcfm_featured', $date->term_id);
+		}
+	}
+
+
 	function update_products($featured_products) {
 		if (!is_array($featured_products)) return;
 
@@ -89,7 +116,7 @@ class WCFM_Multivendor_Featured_Cron {
 	}
 }
 
-add_action( 'initt', function(){
+add_action( 'init', function(){
 	do_action( 'clear_featured_data' );
 	exit;
 });

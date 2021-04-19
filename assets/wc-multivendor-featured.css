@@ -72,6 +72,7 @@ ul.error-store-featured-info >li + li {margin-top: 2px;}
 dl.store-featured-info {
     display: grid;
     font-size: 15px;
+    margin: 0;
     grid-template-columns: minmax(150px, max-content) 1fr;
 }
 

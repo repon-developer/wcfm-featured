@@ -36,6 +36,8 @@ const Categories = ({ name, category, onChange }) => {
 const FeatureVendorAdd = (props) => {
     const datepicker = useRef(null);
 
+    const featured_dates = Array.isArray(props.featured_dates) ? props.featured_dates : [];
+
     const [state, setState] = useState({
         category: '',
         dates: [],
@@ -46,6 +48,13 @@ const FeatureVendorAdd = (props) => {
     useEffect(() => {
         const disable_dates = unavailable_dates_vendor.filter((date) => category == date.term_id).map((date) => date.feature_date);
 
+        featured_dates.forEach((date) => {
+            if ( category === date.term_id ) {
+                disable_dates.push(date.feature_date)
+            }
+        });
+
+
         jQuery(datepicker.current).flatpickr({
             minDate: 'today',
             mode: "multiple",
@@ -54,10 +63,12 @@ const FeatureVendorAdd = (props) => {
             disable: disable_dates,
             onChange: (selectedDates, dates, instance) => {
                 dates = dates.split(',').map((date) => date.trim());
-                setState({...state, dates})
+                setState({ ...state, dates })
             }
         })
     }, [category]);
+
+
 
     const onSubmit = (e) => {
         if (!category.length) {
@@ -72,74 +83,56 @@ const FeatureVendorAdd = (props) => {
 
 
         const _flatpickr = datepicker.current._flatpickr
-
-        if ( _flatpickr.selectedDates.length !== dates) {
+        if (_flatpickr.selectedDates.length !== dates.length) {
             e.preventDefault();
             return alert('Please review selected dates again.')
         }
     }
 
+    
+
     const price = Array.isArray(dates) ? (dates.length * wcfeatured.pricing.vendor).toFixed(2) : 0;
 
     return (
-        <div className="wcfm-container" style={{ marginBottom: 40 }}>
-            <div className="wcfm-content">
-                <h2>Feature your BLEX store</h2>
-                <div className="gap-10" />
-                <form className="wcfm-vendor-featured-form wcfm-vendor-featured-store-form" method="POST">
-                    <input type="hidden" name="_nonce_featured_vendor" value={props._nonce} />
+        <React.Fragment>
+            {/* {featured_dates.length > 0 && <VendorFeaturedInfo categories={categories} />} */}
+            <div className="wcfm-container" style={{ marginBottom: 40 }}>
+                <div className="wcfm-content">
+                    <h2>Feature your BLEX store</h2>
+                    <div className="gap-10" />
+                    <form className="wcfm-vendor-featured-form wcfm-vendor-featured-store-form" method="POST">
+                        <input type="hidden" name="_nonce_featured_vendor" value={props._nonce} />
 
-                    <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid">
-                        <label>Category</label>
-                        <Categories name="feature_category" category={category} onChange={(category) => setState({ ...state, category })} />
+                        <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid">
+                            <label>Category</label>
+                            <Categories name="feature_category" category={category} onChange={(category) => setState({ ...state, category })} />
 
-                        <label>Date</label>
-                        <input ref={datepicker} type="text" className="wcfm-text" />
+                            <label>Date</label>
+                            <input ref={datepicker} type="text" className="wcfm-text" />
 
-                        {(Array.isArray(dates) && dates.length > 0) && 
-                            <React.Fragment>
-                                {dates.map(date => <input type="hidden" name="feature_dates[]" value={date} />)}
-                                <label>Days</label>
-                                <span>{dates.length}</span>
+                            {(Array.isArray(dates) && dates.length > 0) &&
+                                <React.Fragment>
+                                    {dates.map(date => <input type="hidden" name="feature_dates[]" value={date} />)}
+                                    <label>Days</label>
+                                    <span>{dates.length}</span>
 
-                                <label>Total Price</label>
-                                <span>${price}</span>
-                                <input type="hidden" name="price" value={price} />
-                            </React.Fragment>
-                        }
-                        
-                    </fieldset>
-                    <div className="gap-60" />
-                    <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
-                </form>
+                                    <label>Total Price</label>
+                                    <span>${price}</span>
+                                    <input type="hidden" name="price" value={price} />
+                                </React.Fragment>
+                            }
+
+                        </fieldset>
+                        <div className="gap-60" />
+                        <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        </React.Fragment>
     )
 }
 
-const VendorFeaturedInfo = (props) => {
-    const { start_date, days, category } = props;
 
-    return (
-        <div className="wcfm-container" style={{ marginBottom: 40 }}>
-            <div className="wcfm-content">
-                <h2>Featured Info</h2>
-                <div className="gap-10" />
-                <dl className="store-featured-info">
-                    <dt>Start Date</dt>
-                    <dd>{moment(start_date).format('DD MMM, YYYY')}</dd>
-                    <dt>Days</dt>
-                    <dd>{days}</dd>
-                    <dt>Expire on</dt>
-                    <dd>{moment(start_date).add(days, 'days').format('DD MMM, YYYY')}</dd>
-                    <dt>Category</dt>
-                    <dd>{category}</dd>
-                </dl>
-            </div>
-        </div>
-    )
-
-}
 
 const ProductItem = (props) => {
     const { product } = props;
@@ -225,7 +218,7 @@ const FeaturedProductsAdd = (props) => {
     const on_submit = (e) => {
         let error = null;
 
-        if ( !products.length) {
+        if (!products.length) {
             e.preventDefault();
             alert('Please add a product.')
         }
@@ -306,13 +299,13 @@ const FeaturedProducts = (props) => {
                 </tr>
             </thead>
 
-            {products.length == 0 && 
-                 <tr>
-                    <td colSpan={7} style={{textAlign: 'center'}}>No Products</td>
+            {products.length == 0 &&
+                <tr>
+                    <td colSpan={7} style={{ textAlign: 'center' }}>No Products</td>
                 </tr>
             }
 
-            {products.length > 0 && products.map((product) => 
+            {products.length > 0 && products.map((product) =>
                 <tr>
                     <td>#{product.id}</td>
                     <td>{product.post_title}</td>
@@ -345,21 +338,18 @@ const MultivendorFeatured = () => {
         return <h2 className="loading">Loading...</h2>
     }
 
-    const { featured_vendor, vendor_featured_products, session_products } = state;
-
+    const { featured_dates, vendor_featured_products, session_products } = state;
     return (
         <React.Fragment>
-            {typeof featured_vendor === 'object' && <VendorFeaturedInfo {...featured_vendor} />}
-            {featured_vendor == '' && <FeatureVendorAdd _nonce={state.nonce_vendor_featured} />}
+            <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} />
 
             <FeaturedProducts products={vendor_featured_products} />
-
             <FeaturedProductsAdd products={session_products} _nonce={state.nonce_featured_products} />
         </React.Fragment>
     )
 }
 
 const root_holder = document.getElementById("wc-multivendor-featured");
-if ( root_holder ) {
+if (root_holder) {
     ReactDOM.render(<MultivendorFeatured />, root_holder);
 }
