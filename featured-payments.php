@@ -22,7 +22,7 @@ class WCFM_Multivendor_Featured_Payments {
 
         //fire event after successful payment
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
-        $this->featured_info_payment_successfull('');
+        //$this->featured_info_payment_successfull('');
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
     }
 

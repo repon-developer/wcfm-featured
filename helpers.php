@@ -66,6 +66,7 @@ function get_wcfm_feature_products() {
     $table = get_wcfm_feature_table('products');
 
 	$sql = sprintf("SELECT products.*, posts.post_author FROM $table products INNER JOIN $wpdb->posts posts ON products.product_id = posts.ID WHERE feature_date >= DATE(NOW()) AND post_author = %d ORDER BY feature_date", get_current_user_id(  ));
+	$sql = sprintf("SELECT products.*, posts.post_author FROM $table products INNER JOIN $wpdb->posts posts ON products.product_id = posts.ID WHERE post_author = %d ORDER BY feature_date", get_current_user_id(  ));
 
 	$vendor_products = $wpdb->get_results($sql, ARRAY_A);
 
