@@ -22,13 +22,11 @@ class WCFM_Multivendor_Featured_Payments {
 
         //fire event after successful payment
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
-        //$this->featured_info_payment_successfull('');
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
     }
 
     function secured_wcfeatured_price($submission) {
         $submission['payment_total'] = $_SESSION['wcfm_featured_price'] * 100;
-        error_log($submission['payment_total']);
         return $submission;
     }
 
@@ -36,8 +34,6 @@ class WCFM_Multivendor_Featured_Payments {
         $current_form = $_SESSION['wcfm_featured_current_form'];
         $this->save_feature_data_vendor($current_form);
         $this->save_feature_data_products($current_form);
-
-        exit;
 
         unset($_SESSION['wcfm_featured_price']);
         unset($_SESSION['wcfm_featured_current_form']);
