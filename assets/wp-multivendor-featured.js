@@ -268,16 +268,13 @@ const FeaturedProductsAdd = (props) => {
             e.preventDefault();
             return alert(error)
         }
-
-
-
-        e.preventDefault();
     }
 
     const cat_date = {};
 
     props.category_dates.forEach((current) => {
-        const key = `${current.term_id}_${current.feature_date}`;
+        const term_id = current.sub_term && current.sub_term.length ? current.sub_term : current.term_id;
+        const key = `${term_id}_${current.feature_date}`;
 
         if (typeof cat_date[key] !== 'object') {
             cat_date[key] = { term_id: current.term_id, date: current.feature_date, total: 0 };
@@ -299,8 +296,6 @@ const FeaturedProductsAdd = (props) => {
             cat_date[key].total = cat_date[key].total + 1;
         })
     })
-
-
 
     return (
         <div className="wcfm-container">

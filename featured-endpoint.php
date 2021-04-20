@@ -81,7 +81,7 @@ class WCFM_Multivendor_Featured_Endpoint {
         });
 
         $unavailable_dates_vendor = $wpdb->get_results(
-            "SELECT term_id, feature_date, COUNT(*) as total FROM $feature_table 
+            "SELECT term_id, sub_term, feature_date, COUNT(*) as total FROM $feature_table 
             WHERE feature_date >= DATE(NOW()) GROUP BY term_id, feature_date HAVING total >= 8");
 
         if ( !is_array($unavailable_dates_vendor)) {
