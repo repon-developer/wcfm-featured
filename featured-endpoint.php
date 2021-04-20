@@ -88,8 +88,8 @@ class WCFM_Multivendor_Featured_Endpoint {
             $unavailable_dates_vendor = [];
         }
 
-        wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], filemtime(WCFM_FEATURED_PATH. 'assets/wp-multivendor-featured.js'), true);        
-        wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
+        wp_enqueue_script( 'wcfm-feature', WCFM_FEATURED_URI . 'assets/wcfm-feature.js', ['jquery'], filemtime(WCFM_FEATURED_PATH. 'assets/wcfm-feature.js'), true); 
+        wp_localize_script( 'wcfm-feature', 'wcfm_feature', [
             'vendor_limit' => get_wcfm_limit(),
             'product_limit' => get_wcfm_limit('products'),
             'ajax' => admin_url( 'admin-ajax.php' ),
@@ -98,14 +98,6 @@ class WCFM_Multivendor_Featured_Endpoint {
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
             'categories' => $get_terms,
         ]);
-    }
-
-    function enqueue_babel_script($tag, $handle, $src){
-        if ( 'wc-multivendor-featured' === $handle ) {
-            $tag = '<script type="text/babel" src="' . esc_url( $src ) . '" ></script>';
-        }
-    
-        return $tag;
     }
 
     public function wcfm_customers_load_views( $end_point ) {
