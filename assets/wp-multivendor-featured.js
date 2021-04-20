@@ -128,17 +128,9 @@ const FeatureVendorAdd = (props) => {
 }
 
 const ProductItem = (props) => {
-    const { cat_date } = props;
-    const [product, setProduct] = useState(props.product);
-    
+    const { product, cat_date } = props;
     const { id, category, sub_category, dates } = props.product;
-
-
-    console.log(product);
-
     const datepicker = useRef(null);
-
-    
 
     useEffect(() => {
         let term_id = product.sub_category && product.sub_category.length ? product.sub_category : product.category;
@@ -153,8 +145,7 @@ const ProductItem = (props) => {
             onChange: (selectedDates, datesStr) => {
                 datesStr = datesStr.split(',').map((date) => date.trim());
                 if (typeof props.onChange === 'function') {
-                    //props.onChange({ ...product, dates: datesStr })
-                    setProduct({ ...product, dates: datesStr })
+                    props.onChange({ ...product, dates: datesStr })
                 }
             }
         }) 
