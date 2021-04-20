@@ -130,6 +130,7 @@ const FeatureVendorAdd = (props) => {
 const ProductItem = (props) => {
     const { product, cat_date } = props;
     const { id, category, sub_category, dates } = props.product;
+
     const datepicker = useRef(null);
 
     useEffect(() => {
@@ -156,13 +157,6 @@ const ProductItem = (props) => {
         }
 
     }, [id, category, sub_category, dates]);
-
-    useEffect(() => {
-        if (typeof props.onChange === 'function') {
-            props.onChange({...product})
-        }
-
-    }, [product]);
 
     const update = (product) => {
         if (typeof props.onChange === 'function') {
@@ -216,7 +210,7 @@ const FeaturedProductsAdd = (props) => {
 
     useEffect(() => {
 
-        setProducts(props.products)
+        setProducts([...props.products])
 
     }, [props.products]);
 
