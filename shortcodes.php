@@ -70,7 +70,7 @@ class WCFM_Multivendor_Featured_Shortcodes {
             return $query_args;
         }
 
-        $term = get_term_by('slug', $attributes['wcfm_featured'], 'product_cat');
+        $term = get_term_by('slug', trim($attributes['wcfm_featured']), 'product_cat');
         if ( !is_a($term, 'WP_Term') ) {
             return $query_args;
         }

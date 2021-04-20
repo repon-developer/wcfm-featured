@@ -82,7 +82,7 @@ class WCFM_Multivendor_Featured_Endpoint {
 
         $unavailable_dates_vendor = $wpdb->get_results(
             "SELECT term_id, feature_date, COUNT(*) as total FROM $feature_table 
-            WHERE feature_date > DATE(NOW()) GROUP BY term_id, feature_date HAVING total >= 8");
+            WHERE feature_date >= DATE(NOW()) GROUP BY term_id, feature_date HAVING total >= 8");
 
         if ( !is_array($unavailable_dates_vendor)) {
             $unavailable_dates_vendor = [];
@@ -94,7 +94,8 @@ class WCFM_Multivendor_Featured_Endpoint {
             'unavailable_dates_vendor' => $unavailable_dates_vendor,
             'pricing' => get_wcfm_featured_pricing(),            
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
-            'categories' => $get_terms
+            'categories' => $get_terms,
+            
         ]);
     }
 

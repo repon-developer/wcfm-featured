@@ -13,12 +13,13 @@ class WCFM_Multivendor_Featured {
 
     function __construct() {
         $this->load();
+        
         add_action( 'wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action( 'wp_ajax_get_featured_data', [$this, 'get_featured_data']);
         add_action( 'wp_ajax_nopriv_get_featured_data', [$this, 'get_featured_data']);
 
         add_action( 'begin_wcfm_settings_form_style', 	array($this, 'featured_pricing'), 14);
-		add_action( 'wcfm_settings_update', 			array($this, 'featured_pricing_update'), 14);
+		add_action( 'wcfm_settings_update', 			array($this, 'featured_pricing_update'), 14);  
     }
 
     private function load() {
@@ -29,12 +30,39 @@ class WCFM_Multivendor_Featured {
 
         include_once 'shortcodes.php';
         $this->endpoints = new WCFM_Multivendor_Featured_Shortcodes();
-        
-        include_once 'featured-endpoint.php';
-        $this->endpoints = new WCFM_Multivendor_Featured_Endpoint();
 
         include_once 'featured-payments.php';
-        $this->endpoints = new WCFM_Multivendor_Featured_Payments();
+        $this->payments = new WCFM_Multivendor_Featured_Payments();
+    }
+
+    function create_tables() {
+        global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $table_vendor = $wpdb->prefix . 'wcfm_feature_vendors';
+        $table_vendor_sql = "CREATE TABLE IF NOT EXISTS $table_vendor (
+            ID bigint(20) NOT NULL AUTO_INCREMENT,
+            vendor_id bigint(20) DEFAULT '0' NOT NULL,
+            term_id bigint(20) DEFAULT '0' NOT NULL,
+            feature_date date DEFAULT '0000-00-00' NOT NULL,
+            created_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY (ID)
+        ) $charset_collate;";
+
+        $wpdb->query($table_vendor_sql);
+
+        $table_products = $wpdb->prefix . 'wcfm_feature_products';
+        $table_products_sql = "CREATE TABLE IF NOT EXISTS $table_products (
+            ID bigint(20) NOT NULL AUTO_INCREMENT,
+            product_id bigint(20) DEFAULT '0' NOT NULL,
+            term_id bigint(20) DEFAULT '0' NOT NULL,
+            sub_term bigint(20) DEFAULT '0' NOT NULL,
+            feature_date date DEFAULT '0000-00-00' NOT NULL,
+            created_time datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY (ID)
+        ) $charset_collate;";
+        $wpdb->query($table_products_sql);
+          
     }
 
     function enqueue_scripts() {
@@ -63,12 +91,21 @@ class WCFM_Multivendor_Featured {
             }
         });
 
+
+        $table_products = get_wcfm_feature_table('products');
+	    $category_dates = $wpdb->get_results("SELECT term_id, feature_date, COUNT(*) as total FROM $table_products WHERE feature_date >= DATE(NOW()) GROUP BY term_id, feature_date");
+
+        array_walk($category_dates, function(&$category){
+            $category->total = absint( $category->total );
+        });
+        
         wp_send_json([
             'featured_dates' => $featured_dates,
             'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
 
             'vendor_products' => get_wcfm_feature_products(),
             'session_products' => isset($_SESSION['wcfm_featured_products']) ? $_SESSION['wcfm_featured_products'] : [],
+            'category_dates' => $category_dates,
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
         ]);
 

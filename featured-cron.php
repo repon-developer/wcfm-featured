@@ -14,24 +14,9 @@ class WCFM_Multivendor_Featured_Cron {
 
     function __construct() {
 		add_action( 'check_featured_data', [$this, 'check_featured_data_callback']);
-
-		//update product id after updating user featured products
-		add_action( 'update_user_meta', [$this, 'update_products'], 23, 4);
-
-		register_activation_hook( __FILE__, function() {
-			if (! wp_next_scheduled ( 'check_featured_data' )) {
-				wp_schedule_event( time(), 'hourly', 'check_featured_data' );
-			}
-		});
-
-		register_deactivation_hook( __FILE__, function() {
-			wp_clear_scheduled_hook( 'check_featured_data' );
-		});
     }
 
 	function check_featured_data_callback() {
-		$this->users = get_users(array('role' => 'wcfm_vendor'));
-
 		$this->update_vendor_feature();
 		$this->update_feature_products();
 	}

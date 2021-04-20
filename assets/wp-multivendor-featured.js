@@ -128,27 +128,50 @@ const FeatureVendorAdd = (props) => {
 }
 
 const ProductItem = (props) => {
-    const { product } = props;
+    const { cat_date } = props;
+    const [product, setProduct] = useState(props.product);
+    
     const { id, category, sub_category, dates } = props.product;
+
+
+    console.log(product);
 
     const datepicker = useRef(null);
 
-    useEffect(() => {
+    
 
-        jQuery(datepicker.current).flatpickr({
+    useEffect(() => {
+        let term_id = product.sub_category && product.sub_category.length ? product.sub_category : product.category;
+        const disable_dates = Object.values(cat_date).filter((item) => item.term_id === term_id & item.total >= 3).map(date => date.date)
+ 
+        const picker = flatpickr(datepicker.current, {
             minDate: 'today',
             mode: "multiple",
             dateFormat: "Y-m-d",
             defaultDate: dates,
-            onChange: (selectedDates, dates) => {
-                dates = dates.split(',').map((date) => date.trim());
+            disable: disable_dates,
+            onChange: (selectedDates, datesStr) => {
+                datesStr = datesStr.split(',').map((date) => date.trim());
                 if (typeof props.onChange === 'function') {
-                   props.onChange({ ...product, dates: dates })
+                    //props.onChange({ ...product, dates: datesStr })
+                    setProduct({ ...product, dates: datesStr })
                 }
             }
-        })
+        }) 
 
-    }, [id, category, sub_category]);
+
+        return () => {
+            picker.destroy();
+        }
+
+    }, [id, category, sub_category, dates]);
+
+    useEffect(() => {
+        if (typeof props.onChange === 'function') {
+            props.onChange({...product})
+        }
+
+    }, [product]);
 
     const update = (product) => {
         if (typeof props.onChange === 'function') {
@@ -181,7 +204,7 @@ const ProductItem = (props) => {
             {childs.length > 0 &&
                 <React.Fragment>
                     <label>Sub Category</label>
-                    <select defaultValue={sub_category} className="wcfm-select" name={`products[${props.number}][sub_category]`} onChange={(e) => update({ ...product, sub_category: e.target.value })}>
+                    <select value={sub_category} className="wcfm-select" name={`products[${props.number}][sub_category]`} onChange={(e) => update({ ...product, sub_category: e.target.value })}>
                         <option value="">Select Sub Category</option>
                         {childs.map(c => <option value={c.term_id}>{c.name}</option>)}
                     </select>
@@ -195,8 +218,16 @@ const ProductItem = (props) => {
     )
 }
 
+
 const FeaturedProductsAdd = (props) => {
-    const [products, setProducts] = useState(props.products);
+    const [products, setProducts] = useState([]);
+
+
+    useEffect(() => {
+
+        setProducts(products)
+
+    }, [products]);
 
     const add_feature_product = () => {
         products.push({ id: '', dates: [], category: '' });
@@ -214,6 +245,8 @@ const FeaturedProductsAdd = (props) => {
     }
 
     const on_submit = (e) => {
+        console.log(products)
+
         let error = null;
 
         if (!products.length) {
@@ -229,7 +262,7 @@ const FeaturedProductsAdd = (props) => {
                 continue;
             }
 
-            if ( !Array.isArray(product.dates) || !product.dates.length ) {
+            if (!Array.isArray(product.dates) || !product.dates.length) {
                 error = 'Please select feature dates';
                 continue;
             }
@@ -244,7 +277,39 @@ const FeaturedProductsAdd = (props) => {
             e.preventDefault();
             return alert(error)
         }
+
+
+
+        e.preventDefault();
     }
+
+    const cat_date = {};
+
+    props.category_dates.forEach((current) => {
+        const key = `${current.term_id}_${current.feature_date}`;
+
+        if (typeof cat_date[key] !== 'object') {
+            cat_date[key] = { term_id: current.term_id, date: current.feature_date, total: 0 };
+        }
+
+        cat_date[key].total = cat_date[key].total + current.total;
+    })
+
+    products.forEach((product) => {
+        let term_id = product.sub_category && product.sub_category.length ? product.sub_category : product.category;
+        if (!product.id.length || !term_id.length || !product.dates.length) return;
+
+        product.dates.forEach(current_date => {
+            const key = `${term_id}_${current_date}`;
+            if (typeof cat_date[key] !== 'object') {
+                cat_date[key] = { term_id, date: current_date, total: 0 };
+            }
+
+            cat_date[key].total = cat_date[key].total + 1;
+        })
+    })
+
+
 
     return (
         <div className="wcfm-container">
@@ -255,7 +320,7 @@ const FeaturedProductsAdd = (props) => {
                     <input type="hidden" name="_nonce_featured_products" value={props._nonce} />
                     <div className="wcfm_clearfix" />
 
-                    {products.map((p, index) => <ProductItem onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
+                    {products.map((p, index) => <ProductItem cat_date={cat_date} onDelete={on_delete} key={index} number={index} product={products[index]} onChange={(product) => on_update(product, index)} />)}
 
                     <span className="add-new-btn" onClick={add_feature_product}>Add featured product</span>
 
@@ -326,14 +391,13 @@ const MultivendorFeatured = () => {
         return <h2 className="loading">Loading...</h2>
     }
 
-    const { featured_dates, vendor_products, session_products } = state;
-
+    const { featured_dates, category_dates, vendor_products, session_products } = state;
 
     return (
         <React.Fragment>
-            <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} />
+            {/* <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} /> */}
             <FeaturedProducts products={vendor_products} />
-            <FeaturedProductsAdd products={session_products} _nonce={state.nonce_featured_products} />
+            <FeaturedProductsAdd category_dates={category_dates} products={session_products} _nonce={state.nonce_featured_products} />
         </React.Fragment>
     )
 }
