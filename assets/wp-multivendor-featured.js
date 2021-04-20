@@ -8,7 +8,7 @@
 })(jQuery);
 
 const { useState, useEffect, useRef } = React;
-const { categories, products, unavailable_dates_vendor } = wcfeatured;
+const { categories, products, unavailable_dates_vendor, product_limit } = wcfeatured;
 
 const main_category = categories.filter(cat => cat.parent == 0);
 
@@ -134,7 +134,7 @@ const ProductItem = (props) => {
 
     useEffect(() => {
         let term_id = product.sub_category && product.sub_category.length ? product.sub_category : product.category;
-        const disable_dates = Object.values(cat_date).filter((item) => item.term_id === term_id & item.total >= 3).map(date => date.date)
+        const disable_dates = Object.values(cat_date).filter((item) => item.term_id === term_id & item.total >= product_limit).map(date => date.date)
  
         const picker = flatpickr(datepicker.current, {
             minDate: 'today',
@@ -382,7 +382,7 @@ const MultivendorFeatured = () => {
 
     return (
         <React.Fragment>
-            {/* <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} /> */}
+            <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} />
             <FeaturedProducts products={vendor_products} />
             <FeaturedProductsAdd category_dates={category_dates} products={session_products} _nonce={state.nonce_featured_products} />
         </React.Fragment>

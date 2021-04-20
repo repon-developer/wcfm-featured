@@ -9,6 +9,10 @@ function get_wcfm_vendor_featured_url($endpoint = 'wcfm-featured') {
     return wcfm_get_endpoint_url( $endpoint, '', get_wcfm_page());
 }
 
+function get_wcfm_limit($type = 'vendor') {
+    if ( $type == 'products') return 12;
+    return 8;
+}
 
 function get_wcfm_featured_pricing() {
     $pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_pricing' ), ['vendor' => 4.99, 'category' => 2.99, 'sub_category' => 2.29]);
@@ -66,7 +70,6 @@ function get_wcfm_feature_products() {
     $table = get_wcfm_feature_table('products');
 
 	$sql = sprintf("SELECT products.*, posts.post_author FROM $table products INNER JOIN $wpdb->posts posts ON products.product_id = posts.ID WHERE feature_date >= DATE(NOW()) AND post_author = %d ORDER BY feature_date", get_current_user_id(  ));
-	$sql = sprintf("SELECT products.*, posts.post_author FROM $table products INNER JOIN $wpdb->posts posts ON products.product_id = posts.ID WHERE post_author = %d ORDER BY feature_date", get_current_user_id(  ));
 
 	$vendor_products = $wpdb->get_results($sql, ARRAY_A);
 

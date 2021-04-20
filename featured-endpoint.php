@@ -90,12 +90,13 @@ class WCFM_Multivendor_Featured_Endpoint {
 
         wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], filemtime(WCFM_FEATURED_PATH. 'assets/wp-multivendor-featured.js'), true);        
         wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
+            'vendor_limit' => get_wcfm_limit(),
+            'product_limit' => get_wcfm_limit('products'),
             'ajax' => admin_url( 'admin-ajax.php' ),
             'unavailable_dates_vendor' => $unavailable_dates_vendor,
             'pricing' => get_wcfm_featured_pricing(),            
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
             'categories' => $get_terms,
-            
         ]);
     }
 

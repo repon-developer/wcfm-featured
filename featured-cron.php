@@ -28,7 +28,7 @@ class WCFM_Multivendor_Featured_Cron {
 
 		$feature_table = get_wcfm_feature_table();
 
-		$vendors_limit = 8;
+		$vendors_limit = get_wcfm_limit();
 
 		$featured_dates = $wpdb->get_results(sprintf("SELECT * FROM %s WHERE feature_date = DATE(NOW()) LIMIT %d", $feature_table, $vendors_limit));
 
@@ -43,7 +43,7 @@ class WCFM_Multivendor_Featured_Cron {
 		$wpdb->delete($wpdb->prefix.'postmeta', array('meta_key' => 'wcfm_featured'));
 
 		$feature_table = get_wcfm_feature_table('products');
-		$per_day_limit = 12;
+		$per_day_limit = get_wcfm_limit('products');
 
 		$products = $wpdb->get_results(sprintf("SELECT * FROM $feature_table WHERE feature_date = DATE(NOW()) LIMIT %d", $per_day_limit));
 		while ($product = current($products)) {
