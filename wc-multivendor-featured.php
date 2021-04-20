@@ -29,7 +29,7 @@ register_activation_hook( __FILE__, function() {
 	$WCFM_Multivendor_Featured->create_tables();
 	
 	if (! wp_next_scheduled ( 'check_featured_data' )) {
-		wp_schedule_event( time(), 'daily', 'check_featured_data' );
+		wp_schedule_event( strtotime('12:00 AM'), 'twicedaily', 'check_featured_data' );
 	}
 });
 
