@@ -216,9 +216,9 @@ const FeaturedProductsAdd = (props) => {
 
     useEffect(() => {
 
-        setProducts(products)
+        setProducts(props.products)
 
-    }, [products]);
+    }, [props.products]);
 
     const add_feature_product = () => {
         products.push({ id: '', dates: [], category: '' });
@@ -378,6 +378,7 @@ const MultivendorFeatured = () => {
     }
 
     const { featured_dates, category_dates, vendor_products, session_products } = state;
+
 
     return (
         <React.Fragment>
