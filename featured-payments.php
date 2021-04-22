@@ -23,7 +23,10 @@ class WCFM_Multivendor_Featured_Payments {
         //fire event after successful payment
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
-        //$this->featured_info_payment_successfull();
+
+        add_action( 'init', function(){
+            //$this->save_feature_data_products('wcfm_feature_product');
+        });        
     }
 
     function secured_wcfeatured_price($submission) {
@@ -65,20 +68,21 @@ class WCFM_Multivendor_Featured_Payments {
     function save_feature_data_products($current_form) {
         if ( $current_form !== 'wcfm_feature_product') return;
 
-        global $wpdb;
-        $feature_products = get_wcfm_feature_table('products');
-
-        $session_product = $_SESSION['wcfm_featured_product'];
-
-        $dates = $session_product['dates'];
-
-        $products = [];
-        while ($date = current($dates)) {
-            next($dates);
-            $products[] = $wpdb->prepare("(%d, %d, %d, %s)", $session_product['id'], $session_product['category'], $session_product['sub_category'], $date);
+        $feature_products = get_user_meta( get_current_user_id(), 'wcfm_feature_products', true);
+        if ( !is_array($feature_products) ) {
+            $feature_products = [];
         }
 
-        $wpdb->query(sprintf("INSERT INTO $feature_products (product_id, term_id, sub_term, feature_date) VALUES %s", implode( ",\n", $products )));
+        $feature_product = $_SESSION['wcfm_featured_product'];        
+        $dates = $feature_product['dates'];
+        unset($feature_product['dates']);		
+        while ($date = current($dates)) {
+            next($dates);
+            $feature_dates[] = array_merge(['date' => $date], $feature_product);
+        }
+        
+        $feature_products = array_merge($feature_products, $feature_dates);
+        update_user_meta(get_current_user_id(), 'wcfm_feature_products', $feature_products);
         unset($_SESSION['wcfm_featured_products']);
     }
 
@@ -109,7 +113,14 @@ class WCFM_Multivendor_Featured_Payments {
 
         $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_product';
         $_SESSION['wcfm_featured_price'] = $_POST['price'];
-        $_SESSION['wcfm_featured_product'] = array('id' => $_POST['id'], 'category' => $_POST['category'], 'dates' => $_POST['dates']);
+        
+        $_SESSION['wcfm_featured_product'] = array(
+            'id'            => $_POST['id'], 
+            'dates'         => $_POST['dates'],
+            'category'      => $_POST['category'], 
+            'packages'      => $_POST['packages'], 
+            'sub_category'  => $_POST['sub_category'], 
+        );
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
     }

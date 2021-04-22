@@ -42,17 +42,10 @@ const PricingPackage = (props) => {
     const [pricing, setPricing] = useState({
         'home_page': 50.00,
         'category': 25.00,
-        'subcategory': 15.00,
+        'sub_category': 15.00,
     });
 
-    const [state, setState] = useState({
-        category: 95,
-        sub_category: null,
-        packages: ['home_page', 'category']
-    })
-
-    const {category, sub_category, packages} = state;
-
+    const {category, sub_category, packages} = props.product;
 
     const on_submit = (e) => {
         if ( typeof props.onSubmit === 'function') {
@@ -62,14 +55,13 @@ const PricingPackage = (props) => {
 
     const on_checkbox_update = (current) => {
         const index = packages.findIndex((pack) => pack === current)
-
         if (index >= 0) {
             packages.splice(index, 1);
         } else {
             packages.push(current)
         }
 
-        setState({...state, packages})
+        props.onUpdate({packages})
     }
     
     const dates = Array.isArray(props.dates) ? props.dates : [];
@@ -90,29 +82,32 @@ const PricingPackage = (props) => {
             </tr>
 
             <tr>
-                <td className="checkbox-cell"><input type="checkbox" onChange={() => on_checkbox_update('home_page')} defaultChecked={packages.includes('home_page')} /></td>
-                <td>Home Page</td>
-                <td>{pricing.home_page.toFixed(2)} USD</td>
-            </tr>
-
-            <tr>
-                <td className="checkbox-cell"><input type="checkbox" onChange={() => on_checkbox_update('category')} defaultChecked={packages.includes('category')} /></td>
-                <td>Category Page <Categories value={category} name="category" onChange={(category) => setState({...state, category})} /></td>
-                <td>{pricing.category.toFixed(2)} USD</td>
-            </tr>
-
-            <tr>
-                <td className="checkbox-cell"><input type="checkbox" onChange={() => on_checkbox_update('subcategory')} defaultChecked={packages.includes('subcategory')} /></td>
-                <td>
-                    Subcategory Page 
-                    {packages.includes('subcategory') && <Categories childof={category} value={sub_category} name="sub_category" onChange={(sub_category) => setState({...state, sub_category})} />}
+                <td className="checkbox-cell">
+                    <input id="check_home_page" name="packages[]" value="home_page" type="checkbox" onChange={() => on_checkbox_update('home_page')} defaultChecked={packages.includes('home_page')} />
                 </td>
-                <td>{pricing.subcategory.toFixed(2)} USD</td>
+                <td><label for="check_home_page">Home Page</label></td>
+                <td>{pricing.home_page.toFixed(2)} x {dates.length} = {(pricing.home_page * dates.length).toFixed(2)} USD</td>
+            </tr>
+
+            <tr>
+                <td className="checkbox-cell"><input id="check_category" name="packages[]" value="category" type="checkbox" onChange={() => on_checkbox_update('category')} defaultChecked={packages.includes('category')} /></td>
+                <td><label for="check_category">Category Page</label> <Categories value={category} name="category" onChange={(category) => props.onUpdate({category})} /></td>
+                <td>{pricing.category.toFixed(2)} x {dates.length} = {(pricing.category * dates.length).toFixed(2)} USD</td>
+                
+            </tr>
+
+            <tr>
+                <td className="checkbox-cell"><input id="check_sub_category" name="packages[]" value="sub_category" type="checkbox" onChange={() => on_checkbox_update('sub_category')} defaultChecked={packages.includes('sub_category')} /></td>
+                <td>
+                    <label for="check_sub_category">Subcategory Page</label>
+                    {packages.includes('sub_category') && <Categories childof={category} value={sub_category} name="sub_category" onChange={(sub_category) => props.onUpdate({sub_category})} />}
+                </td>
+                <td>{pricing.sub_category.toFixed(2)} x {dates.length} = {(pricing.sub_category * dates.length).toFixed(2)} USD</td>
             </tr>
 
             <tr class="proccessing-fee">
                 <td colSpan={2}>Processing Fee (5%)</td>
-                <td>{processing_fee.toFixed(2)} USD</td>
+                <td>{processing_fee.toFixed(2)} x {dates.length} = {(processing_fee * dates.length).toFixed(2)} USD</td>
             </tr>
 
             {total_price > 0 &&
@@ -221,64 +216,18 @@ const FeatureVendorAdd = (props) => {
     )
 }
 
-
-const FeaturedProducts = (props) => {
-    const products = Object.values(props.products);
-
-    const date_string = (dates) => {
-        return dates.map(date => moment(date).format('DD MMM'))
-    }
-
-    return (
-        <table class="table-featured-products">
-            <caption>Your Featured Products</caption>
-            <thead>
-                <tr>
-                    <th>#ID</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Sub Category</th>
-                    <th>Dates</th>
-                </tr>
-            </thead>
-
-            {products.length == 0 &&
-                <tr>
-                    <td colSpan={5} style={{ textAlign: 'center' }}>No Products</td>
-                </tr>
-            }
-
-            {products.length > 0 && products.map((product) =>
-                <tr>
-                    <td>#{product.id}</td>
-                    <td>{product.post_title}</td>
-                    <td>{product.category_name}</td>
-                    <td>{product.sub_category_name}</td>
-                    <td>{date_string(product.dates).join(' | ')}</td>
-                </tr>
-            )}
-
-        </table>
-    );
-}
-
-
 const FeaturedProductForm = (props) => {
     const [product, setProduct] = useState({
-        category: 80,
-        dates: []
+        id: null,
+        dates: [],
+        category: 95,
+        sub_category: null,
+        packages: ['home_page', 'category']
     });
 
+    const { id, category, sub_category, dates, packages } = product;
+
     const datepicker = useRef(null);
-
-    const { id, category, sub_category, dates } = product;
-
-
-
-    useEffect(() => {
-        //setProduct({...props.session_product})
-
-    }, [props.session_product]);
 
     useEffect(() => {
         let term_id = product.sub_category && product.sub_category.length ? product.sub_category : product.category;
@@ -292,11 +241,16 @@ const FeaturedProductForm = (props) => {
             disable: disable_dates,
             onChange: (selectedDates, datesStr) => {
                 datesStr = datesStr.split(',').map((date) => date.trim());
+                if ( !selectedDates.length ) {
+                    datesStr = [];
+                }
                 setProduct({ ...product, dates: datesStr })
             }
         })
 
     }, [id, category, sub_category]);
+
+    const on_update = (values) => setProduct({...product, ...values})
 
 
     const on_submit = (e) => {
@@ -310,8 +264,12 @@ const FeaturedProductForm = (props) => {
             error = 'Please select feature dates';
         }
 
-        if (!category) {
+        if ( packages.includes('category') &&  !category) {
             error = 'Please select a category';
+        }
+
+        if ( packages.includes('sub_category') &&  !sub_category) {
+            error = 'Please select a subcategory';
         }
 
         if (error) {
@@ -319,9 +277,6 @@ const FeaturedProductForm = (props) => {
             return alert(error)
         }
     }
-
-
-    const childs = get_sub_categories(product.category);
 
     return (
         <div className="wcfm-container">
@@ -354,13 +309,67 @@ const FeaturedProductForm = (props) => {
                         </tr>
                     </table>
 
-                    <PricingPackage onSubmit={on_submit} dates={dates} />
+                    <PricingPackage product={product} onSubmit={on_submit} onUpdate={on_update} dates={dates} />
                 </form>
             </div>
         </div>
     )
 }
 
+
+const FeaturedProducts = (props) => {
+    const products = Object.values(props.products);
+
+    const get_package_string = (packages) => {
+        return packages.map((pack) => {
+            if ( pack === 'home_page') {
+                return 'Home';
+            }
+
+            if ( pack === 'category') {
+                return 'Category';
+            }
+
+            if ( pack === 'sub_category') {
+                return 'Sub Category';
+            }
+        })
+    }
+
+    return (
+        <table class="table-featured-products">
+            <caption>Your Featured Products</caption>
+            <thead>
+                <tr>
+                    <th>Dates</th>
+                    <th>#ID</th>
+                    <th>Name</th>
+                    <th>Package</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                </tr>
+            </thead>
+
+            {products.length == 0 &&
+                <tr>
+                    <td colSpan={5} style={{ textAlign: 'center' }}>No Products</td>
+                </tr>
+            }
+
+            {products.length > 0 && products.map((product) =>
+                <tr>
+                    <td>{moment(product.date).format('MMM DD, YYYY')}</td>
+                    <td>#{product.id}</td>
+                    <td>{product.post_title}</td>
+                    <td>{get_package_string(product.packages).join(', ')}</td>
+                    <td>{product.packages.includes('category') || product.packages.includes('sub_category') ? product.category_term_name : ''}</td>
+                    <td>{product.sub_category_term_name}</td>
+                </tr>
+            )}
+
+        </table>
+    );
+}
 
 const MultivendorFeatured = () => {
     const [state, setState] = useState({
@@ -380,14 +389,14 @@ const MultivendorFeatured = () => {
         return <h2 className="loading">Loading...</h2>
     }
 
-    const { featured_dates, category_dates, vendor_products, session_products } = state;
+    const { featured_dates, category_dates, feature_dates, session_products } = state;
 
 
     return (
         <React.Fragment>
             
-            {/* <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} />
-            <FeaturedProducts products={vendor_products} /> */}
+            {/* <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} /> */}
+            <FeaturedProducts products={feature_dates} />
             <FeaturedProductForm category_dates={category_dates} products={session_products} _nonce={state.nonce_featured_products} />
             
         </React.Fragment>

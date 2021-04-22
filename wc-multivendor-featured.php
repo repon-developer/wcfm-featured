@@ -25,9 +25,6 @@ require_once( 'class-wcfmmp-fetured.php' );
 $GLOBALS['WCFM_Multivendor_Featured'] = new WCFM_Multivendor_Featured();
 
 register_activation_hook( __FILE__, function() {
-	global $WCFM_Multivendor_Featured;
-	$WCFM_Multivendor_Featured->create_tables();
-	
 	if (! wp_next_scheduled ( 'check_featured_data' )) {
 		wp_schedule_event( strtotime('12:00 AM'), 'twicedaily', 'check_featured_data' );
 	}
@@ -44,13 +41,12 @@ add_action( 'wcfmmp_loaded', function(){
 });
 
 
-add_action( 'initd', function(){
+add_action( 'init', function(){
+	if (!isset($_GET['dev']) ) return;
+	
+	$feature_products = get_wcfm_feature_products();
 
-	$childs = get_terms( array(
-		'taxonomy' => 'product_cat',
-		'hide_empty' => false,
-	) );
 
-	var_dump($childs);
+	var_dump($feature_products);
 	exit;
 });
