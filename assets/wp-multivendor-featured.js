@@ -8,7 +8,7 @@
 })(jQuery);
 
 const { useState, useEffect, useRef } = React;
-const { categories, products, unavailable_dates_vendor, product_limit } = wcfeatured;
+const { categories, products, vendor_filled_dates, products_filled_dates, product_limit } = wcfeatured;
 
 const main_category = categories.filter(cat => cat.parent == 0);
 
@@ -115,7 +115,7 @@ const PricingPackage = (props) => {
             {total_price > 0 &&
                 <tfoot>
                     <tr>
-                        <td colSpan={2}><button onClick={on_submit} className="wcfm_submit_button">Pay Now</button></td>
+                        <td colSpan={2}><button onClick={on_submit} className="wcfm_submit_button">Activate Now</button></td>
                         <td>Total {total_price.toFixed(2)} USD <input name="price" type="hidden" value={total_price.toFixed(2)} /></td>
                     </tr>
                 </tfoot>
@@ -141,20 +141,11 @@ const FeatureVendorAdd = (props) => {
     const { dates, category, subcategory, packages } = state;
 
     useEffect(() => {
-        const disable_dates = unavailable_dates_vendor.filter((date) => category == date.term_id).map((date) => date.feature_date);
-
-        featured_dates.forEach((date) => {
-            if (category === date.term_id) {
-                disable_dates.push(date.feature_date)
-            }
-        });
-
         jQuery(datepicker.current).flatpickr({
             minDate: 'today',
             mode: "multiple",
             dateFormat: "Y-m-d",
             defaultDate: state.dates,
-            disable: disable_dates,
             onChange: (selectedDates, dates, instance) => {
                 dates = dates.split(',').map((date) => date.trim());
                 setState({ ...state, dates })
@@ -194,7 +185,6 @@ const FeatureVendorAdd = (props) => {
 
     return (
         <React.Fragment>
-            {/* {featured_dates.length > 0 && <VendorFeaturedInfo categories={categories} />} */}
             <div className="wcfm-container" style={{ marginBottom: 40 }}>
                 <div className="wcfm-content">
                     <h2>Feature your BLEX store</h2>
@@ -289,16 +279,11 @@ const FeaturedProductForm = (props) => {
     const datepicker = useRef(null);
 
     useEffect(() => {
-        let term_id = product.subcategory && product.subcategory.length ? product.subcategory : product.category;
-
-        const disable_dates = props.category_dates.filter((item) => item.term_id == term_id & item.total >= wcfeatured.product_limit).map(date => date.feature_date)
-
-        const picker = flatpickr(datepicker.current, {
+        flatpickr(datepicker.current, {
             minDate: 'today',
             mode: "multiple",
             dateFormat: "Y-m-d",
             defaultDate: dates,
-            disable: disable_dates,
             onChange: (selectedDates, datesStr) => {
                 datesStr = datesStr.split(',').map((date) => date.trim());
                 if (!selectedDates.length) {
@@ -396,15 +381,13 @@ const MultivendorFeatured = () => {
         return <h2 className="loading">Loading...</h2>
     }
 
-    const { featured_dates, category_dates, feature_dates, session_products } = state;
-
+    const { nonce_vendor_featured, nonce_featured_products, featured_products } = state;
 
     return (
         <React.Fragment>
-            <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} />
-
-            <FeaturedDates products={feature_dates} />
-            <FeaturedProductForm category_dates={category_dates} products={session_products} _nonce={state.nonce_featured_products} />
+            <FeatureVendorAdd _nonce={nonce_vendor_featured} />
+            <FeaturedDates products={featured_products} />
+            <FeaturedProductForm _nonce={nonce_featured_products} />
         </React.Fragment>
     )
 }

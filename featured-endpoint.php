@@ -71,32 +71,28 @@ class WCFM_Multivendor_Featured_Endpoint {
     public function wcfm_customers_load_scripts( $end_point ) {
         if ( 'wcfm-featured' !== $end_point) return;
 
-        global $wpdb;
-        $feature_table = get_wcfm_feature_table();
-
         $get_terms = get_terms( 'product_cat', array('hide_empty' => false) );
-
         array_walk($get_terms, function(&$term){
             $term->name = html_entity_decode($term->name);
         });
 
-        $unavailable_dates_vendor = $wpdb->get_results(
-            "SELECT term_id, sub_term, feature_date, COUNT(*) as total FROM $feature_table 
-            WHERE feature_date >= DATE(NOW()) GROUP BY term_id, feature_date HAVING total >= 8");
-
-        if ( !is_array($unavailable_dates_vendor)) {
-            $unavailable_dates_vendor = [];
+        if ( !is_array($vendor_filled_dates)) {
+            $vendor_filled_dates = [];
         }
 
         wp_enqueue_script( 'wc-multivendor-featured', WCFM_FEATURED_URI . 'assets/wp-multivendor-featured.js', ['jquery', 'flatpickr', 'moment', 'react', 'react-dom', 'babel'], filemtime(WCFM_FEATURED_PATH. 'assets/wp-multivendor-featured.js'), true);        
         wp_localize_script( 'wc-multivendor-featured', 'wcfeatured', [
+            'ajax' => admin_url( 'admin-ajax.php' ),
+
             'vendor_limit' => get_wcfm_limit(),
             'product_limit' => get_wcfm_limit('products'),
-            'ajax' => admin_url( 'admin-ajax.php' ),
-            'unavailable_dates_vendor' => $unavailable_dates_vendor,
+
+            'vendor_filled_dates' => get_wcfm_vendor_dates(),
+            'products_filled_dates' => get_wcfm_products_dates(),
+
+            'categories' => $get_terms,
             'pricing' => get_wcfm_featured_pricing(),            
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
-            'categories' => $get_terms,
         ]);
     }
 
