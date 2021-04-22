@@ -25,7 +25,7 @@ class WCFM_Multivendor_Featured_Payments {
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
 
         add_action( 'init', function(){
-            //$this->save_feature_data_products('wcfm_feature_product');
+            //$this->save_feature_data_vendor('wcfm_feature_vendor');
         });        
     }
 
@@ -49,19 +49,25 @@ class WCFM_Multivendor_Featured_Payments {
     }
 
     function save_feature_data_vendor($current_form) {
-        global $wpdb;
         if ( $current_form !== 'wcfm_feature_vendor') return;
-        $wcfm_feature_table = get_wcfm_feature_table();
-        
-        $rows = [];
-        $user_id = get_current_user_id(  );
-        $category = $_SESSION['wcfm_feature_vendor']['category'];
-        
-        foreach ($_SESSION['wcfm_feature_vendor']['dates'] as $date) {
-            $rows[] = $wpdb->prepare("(%d, %d, %s)", $user_id, $category, $date);
+
+        $vendor_dates = get_user_meta( get_current_user_id(), 'wcfm_feature_vendor', true);
+        if ( !is_array($vendor_dates) ) {
+            $vendor_dates = [];
         }
 
-        $wpdb->query(sprintf("INSERT INTO $wcfm_feature_table (vendor_id, term_id, feature_date) VALUES %s", implode( ",\n", $rows )));
+        $session_feature = $_SESSION['wcfm_feature_vendor']; 
+        if(!$session_feature) return;
+        
+        $dates = $session_feature['dates'];
+        unset($session_feature['dates']);
+
+        while ($date = current($dates)) {
+            next($dates);
+            $vendor_dates[] = array_merge(['date' => $date], $session_feature);
+        }
+
+        update_user_meta(get_current_user_id(), 'wcfm_feature_vendor', $vendor_dates);
         unset($_SESSION['wcfm_feature_vendor']);
     }
 
@@ -73,7 +79,9 @@ class WCFM_Multivendor_Featured_Payments {
             $feature_products = [];
         }
 
-        $feature_product = $_SESSION['wcfm_featured_product'];        
+        $feature_product = $_SESSION['wcfm_featured_product'];
+        if(!$feature_product) return;
+
         $dates = $feature_product['dates'];
         unset($feature_product['dates']);		
         while ($date = current($dates)) {
@@ -83,7 +91,7 @@ class WCFM_Multivendor_Featured_Payments {
         
         $feature_products = array_merge($feature_products, $feature_dates);
         update_user_meta(get_current_user_id(), 'wcfm_feature_products', $feature_products);
-        unset($_SESSION['wcfm_featured_products']);
+        unset($_SESSION['wcfm_featured_product']);
     }
 
 
@@ -92,16 +100,17 @@ class WCFM_Multivendor_Featured_Payments {
             return;
         }
 
-        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_vendor';
         $_SESSION['wcfm_featured_price'] = $_POST['price'];
+        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_vendor';
 
-        $feature_dates = is_array($_POST['feature_dates']) ? $_POST['feature_dates'] : [];
-        $wcfm_feature_vendor = array('category' => $_POST['feature_category'], 'dates' => $feature_dates);
+        $feature_dates = is_array($_POST['dates']) ? $_POST['dates'] : [];
 
-
-        $_SESSION['wcfm_feature_vendor'] = $wcfm_feature_vendor;
-
-
+        $_SESSION['wcfm_feature_vendor'] = array(
+            'dates'         => $feature_dates,
+            'category'      => $_POST['category'], 
+            'packages'      => $_POST['packages'], 
+            'subcategory'  => $_POST['subcategory'], 
+        );
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
     }
@@ -111,15 +120,15 @@ class WCFM_Multivendor_Featured_Payments {
             return;
         }
 
-        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_product';
         $_SESSION['wcfm_featured_price'] = $_POST['price'];
+        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_product';
         
         $_SESSION['wcfm_featured_product'] = array(
             'id'            => $_POST['id'], 
             'dates'         => $_POST['dates'],
             'category'      => $_POST['category'], 
             'packages'      => $_POST['packages'], 
-            'sub_category'  => $_POST['sub_category'], 
+            'subcategory'  => $_POST['subcategory'], 
         );
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;

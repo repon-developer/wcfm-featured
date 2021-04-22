@@ -17,40 +17,65 @@ class WCFM_Multivendor_Featured_Cron {
     }
 
 	function check_featured_data_callback() {
+		$this->clear_data();
 		$this->update_vendor_feature();
 		$this->update_feature_products();
 	}
 
-	function update_vendor_feature() {
+	function clear_data() {
 		global $wpdb;
-		$wpdb->delete($wpdb->prefix.'usermeta', array('meta_key' => 'wcfm_featured'));
-
-
-		$feature_table = get_wcfm_feature_table();
-
-		$vendors_limit = get_wcfm_limit();
-
-		$featured_dates = $wpdb->get_results(sprintf("SELECT * FROM %s WHERE feature_date = DATE(NOW()) LIMIT %d", $feature_table, $vendors_limit));
-
-		while ( $date = current($featured_dates) ) {
-			next($featured_dates);
-			update_user_meta( $date->vendor_id, 'wcfm_featured', $date->term_id);
+		$packages = ['home_page', 'category', 'subcategory'];
+		foreach ($packages as $key => $package) {
+			$wpdb->delete($wpdb->prefix.'postmeta', array('meta_key' => 'wcfm_featured_'.$package));
+			$wpdb->delete($wpdb->prefix.'usermeta', array('meta_key' => 'wcfm_featured_'.$package));
 		}
 	}
 
-	function update_feature_products() {
-		global $wpdb;
-		$wpdb->delete($wpdb->prefix.'postmeta', array('meta_key' => 'wcfm_featured'));
-
-		$feature_table = get_wcfm_feature_table('products');
-		$per_day_limit = get_wcfm_limit('products');
-
-		$products = $wpdb->get_results(sprintf("SELECT * FROM $feature_table WHERE feature_date = DATE(NOW()) LIMIT %d", $per_day_limit));
-		while ($product = current($products)) {
-			next($products);
-			$category = !empty($product->sub_term) ? $product->sub_term : $product->term_id;
-			update_post_meta( $product->product_id, 'wcfm_featured', $category);
+	function get_term_value($package, $item) {
+		$term_id = null;
+		switch ($package) {
+			case 'category':
+				$term_id = $item['category'];
+				break;
+			
+			case 'subcategory':
+				$term_id = $item['subcategory'];
+				break;
+			
+			default:
+				$term_id = 'home';
+				break;
 		}
+
+		return $term_id;
+	}
+
+	function update_vendor_feature() {
+		$vendor_dates = array_filter(get_wcfm_feature_vendor(), function($date){
+			return $date['date'] == Date('Y-m-d');
+		});
+
+		array_walk($vendor_dates, function($item){
+			$packages = $item['packages'];
+			while ($pack = current($packages)) {
+				next($packages);
+				update_user_meta(get_current_user_id(), 'wcfm_featured_' . $pack, $this->get_term_value($pack, $item));
+			}
+		});
+	}
+
+	function update_feature_products() {
+		$feature_dates = array_filter(get_wcfm_feature_products(), function($date){
+			return $date['date'] == Date('Y-m-d');
+		});
+
+		array_walk($feature_dates, function($item){
+			$packages = $item['packages'];
+			while ($pack = current($packages)) {
+				next($packages);
+				update_post_meta( $item['id'], 'wcfm_featured_' . $pack, $this->get_term_value($pack, $item));				
+			}
+		});
 	}
 }
 

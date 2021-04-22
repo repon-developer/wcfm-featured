@@ -26,7 +26,7 @@ $GLOBALS['WCFM_Multivendor_Featured'] = new WCFM_Multivendor_Featured();
 
 register_activation_hook( __FILE__, function() {
 	if (! wp_next_scheduled ( 'check_featured_data' )) {
-		wp_schedule_event( strtotime('12:00 AM'), 'twicedaily', 'check_featured_data' );
+		wp_schedule_event( time(), 'hourly', 'check_featured_data' );
 	}
 });
 
@@ -44,9 +44,9 @@ add_action( 'wcfmmp_loaded', function(){
 add_action( 'init', function(){
 	if (!isset($_GET['dev']) ) return;
 	
-	$feature_products = get_wcfm_feature_products();
+	$data = get_wcfm_feature_vendor();
 
 
-	var_dump($feature_products);
+	var_dump($data);
 	exit;
 });

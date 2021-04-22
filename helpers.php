@@ -15,7 +15,7 @@ function get_wcfm_limit($type = 'vendor') {
 }
 
 function get_wcfm_featured_pricing() {
-    $pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_pricing' ), ['vendor' => 4.99, 'category' => 2.99, 'sub_category' => 2.29]);
+    $pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_pricing' ), ['vendor' => 4.99, 'category' => 2.99, 'subcategory' => 2.29]);
     array_walk($pricing, function(&$price){
         if ( !$price) {
             $price = 0;
@@ -27,20 +27,45 @@ function get_wcfm_featured_pricing() {
     return $pricing;
 }
 
+function get_wcfm_feature_vendor() {
+    $vendor_dates = get_user_meta( get_current_user_id(), 'wcfm_feature_vendor', true);
+    if ( !is_array($vendor_dates)) {
+        $vendor_dates = [];
+    }
+
+    array_walk($vendor_dates, function(&$vendor) {
+        $category = get_term( $vendor['category'] );
+        if ( is_a($category, 'WP_Term') ) {
+            $vendor['category_name'] = html_entity_decode($category->name);
+        }
+
+        $subcategory = get_term( $vendor['subcategory'] );
+        if ( is_a($subcategory, 'WP_Term') ) {
+           $vendor['subcategory_name'] = html_entity_decode($subcategory->name);
+        }
+    });
+
+    return $vendor_dates;
+}
+
 function get_wcfm_feature_products() {
-    $feature_dates = get_user_meta( get_current_user_id(), 'wcfm_feature_products', true);
+    $feature_dates = (array) get_user_meta( get_current_user_id(), 'wcfm_feature_products', true);
+
+    if ( !is_array($feature_dates)) {
+        $feature_dates = [];
+    }
+
     array_walk($feature_dates, function(&$product) {
-        $product['id'] = $product['id'];
         $product['post_title'] = html_entity_decode(get_the_title($product['id']));
 
         $category = get_term( $product['category'] );
         if ( is_a($category, 'WP_Term') ) {
-            $product['category_term_name'] = html_entity_decode($category->name);
+            $product['category_name'] = html_entity_decode($category->name);
         }
 
-        $sub_category = get_term( $product['sub_category'] );
-        if ( is_a($sub_category, 'WP_Term') ) {
-           $product['sub_category_term_name'] = html_entity_decode($sub_category->name);
+        $subcategory = get_term( $product['subcategory'] );
+        if ( is_a($subcategory, 'WP_Term') ) {
+           $product['subcategory_name'] = html_entity_decode($subcategory->name);
         }
     });
 

@@ -24,10 +24,10 @@ const Categories = ({ name, value, childof, onChange }) => {
     }
 
     let categories = get_sub_categories(childof);
-    if ( childof === undefined ) {
+    if (childof === undefined) {
         categories = main_category
     }
-    
+
     return (
         <select name={name} defaultValue={value} className="wcfm-select" onChange={on_update}>
             <option value="">Select a category</option>
@@ -42,13 +42,15 @@ const PricingPackage = (props) => {
     const [pricing, setPricing] = useState({
         'home_page': 50.00,
         'category': 25.00,
-        'sub_category': 15.00,
+        'subcategory': 15.00,
     });
 
-    const {category, sub_category, packages} = props.product;
+    const pricing_id = props.pricing_id ? props.pricing_id : Date.now();
+
+    const { category, subcategory, packages } = Object.assign({ category: '', subcategory: '', packages: [] }, props.package);
 
     const on_submit = (e) => {
-        if ( typeof props.onSubmit === 'function') {
+        if (typeof props.onSubmit === 'function') {
             props.onSubmit(e);
         }
     }
@@ -61,9 +63,9 @@ const PricingPackage = (props) => {
             packages.push(current)
         }
 
-        props.onUpdate({packages})
+        props.onUpdate({ packages })
     }
-    
+
     const dates = Array.isArray(props.dates) ? props.dates : [];
 
     const price = (packages.length ? packages.map((key) => pricing[key]).reduce((total, current) => total + current) : 0);
@@ -72,7 +74,7 @@ const PricingPackage = (props) => {
     const total_price = (price + processing_fee) * dates.length
 
     const date_strings = (dates) => {
-        return dates.map(date => moment(date).format('MMM DD, YYYY')).join(', ');       
+        return dates.map(date => moment(date).format('MMM DD, YYYY')).join(', ');
     }
 
     return (
@@ -83,26 +85,26 @@ const PricingPackage = (props) => {
 
             <tr>
                 <td className="checkbox-cell">
-                    <input id="check_home_page" name="packages[]" value="home_page" type="checkbox" onChange={() => on_checkbox_update('home_page')} defaultChecked={packages.includes('home_page')} />
+                    <input id={`${pricing_id}check_home_page`} name="packages[]" value="home_page" type="checkbox" onChange={() => on_checkbox_update('home_page')} defaultChecked={packages.includes('home_page')} />
                 </td>
-                <td><label for="check_home_page">Home Page</label></td>
+                <td><label for={`${pricing_id}check_home_page`}>Home Page</label></td>
                 <td>{pricing.home_page.toFixed(2)} x {dates.length} = {(pricing.home_page * dates.length).toFixed(2)} USD</td>
             </tr>
 
             <tr>
-                <td className="checkbox-cell"><input id="check_category" name="packages[]" value="category" type="checkbox" onChange={() => on_checkbox_update('category')} defaultChecked={packages.includes('category')} /></td>
-                <td><label for="check_category">Category Page</label> <Categories value={category} name="category" onChange={(category) => props.onUpdate({category})} /></td>
+                <td className="checkbox-cell"><input id={`${pricing_id}check_category`} name="packages[]" value="category" type="checkbox" onChange={() => on_checkbox_update('category')} defaultChecked={packages.includes('category')} /></td>
+                <td><label for={`${pricing_id}check_category`}>Category Page</label> <Categories value={category} name="category" onChange={(category) => props.onUpdate({ category })} /></td>
                 <td>{pricing.category.toFixed(2)} x {dates.length} = {(pricing.category * dates.length).toFixed(2)} USD</td>
-                
+
             </tr>
 
             <tr>
-                <td className="checkbox-cell"><input id="check_sub_category" name="packages[]" value="sub_category" type="checkbox" onChange={() => on_checkbox_update('sub_category')} defaultChecked={packages.includes('sub_category')} /></td>
+                <td className="checkbox-cell"><input id={`${pricing_id}check_subcategory`} name="packages[]" value="subcategory" type="checkbox" onChange={() => on_checkbox_update('subcategory')} defaultChecked={packages.includes('subcategory')} /></td>
                 <td>
-                    <label for="check_sub_category">Subcategory Page</label>
-                    {packages.includes('sub_category') && <Categories childof={category} value={sub_category} name="sub_category" onChange={(sub_category) => props.onUpdate({sub_category})} />}
+                    <label for={`${pricing_id}check_subcategory`}>Subcategory Page</label>
+                    {packages.includes('subcategory') && <Categories childof={category} value={subcategory} name="subcategory" onChange={(subcategory) => props.onUpdate({ subcategory })} />}
                 </td>
-                <td>{pricing.sub_category.toFixed(2)} x {dates.length} = {(pricing.sub_category * dates.length).toFixed(2)} USD</td>
+                <td>{pricing.subcategory.toFixed(2)} x {dates.length} = {(pricing.subcategory * dates.length).toFixed(2)} USD</td>
             </tr>
 
             <tr class="proccessing-fee">
@@ -113,7 +115,7 @@ const PricingPackage = (props) => {
             {total_price > 0 &&
                 <tfoot>
                     <tr>
-                        <td colSpan={2}><button onClick={on_submit} className="wcfm_submit_button">Activate Now</button></td>
+                        <td colSpan={2}><button onClick={on_submit} className="wcfm_submit_button">Pay Now</button></td>
                         <td>Total {total_price.toFixed(2)} USD <input name="price" type="hidden" value={total_price.toFixed(2)} /></td>
                     </tr>
                 </tfoot>
@@ -122,6 +124,8 @@ const PricingPackage = (props) => {
     );
 }
 
+
+
 const FeatureVendorAdd = (props) => {
     const datepicker = useRef(null);
 
@@ -129,10 +133,12 @@ const FeatureVendorAdd = (props) => {
 
     const [state, setState] = useState({
         category: '',
+        subcategory: '',
         dates: [],
+        packages: ['home_page', 'category']
     });
 
-    const { dates, category } = state;
+    const { dates, category, subcategory, packages } = state;
 
     useEffect(() => {
         const disable_dates = unavailable_dates_vendor.filter((date) => category == date.term_id).map((date) => date.feature_date);
@@ -154,28 +160,37 @@ const FeatureVendorAdd = (props) => {
                 setState({ ...state, dates })
             }
         })
-    }, [category]);
+
+    }, [category, subcategory]);
+
+    const on_update = (values) => setState({ ...state, ...values })
 
     const onSubmit = (e) => {
-        if (!category.length) {
-            e.preventDefault();
-            return alert('Please select a category');
+        let error = null;
+
+        if (!Array.isArray(dates) || !dates.length) {
+            error = 'Please select feature dates';
         }
 
-        if (dates.length == 0) {
-            e.preventDefault();
-            return alert('You have not selected any date.');
+        if (packages.includes('category') && !category) {
+            error = 'Please select a category';
         }
 
+        if (packages.includes('subcategory') && !subcategory) {
+            error = 'Please select a subcategory';
+        }
+
+        if (error) {
+            e.preventDefault();
+            return alert(error)
+        }
 
         const _flatpickr = datepicker.current._flatpickr
         if (_flatpickr.selectedDates.length !== dates.length) {
             e.preventDefault();
-            return alert('Please review selected dates again.')
+            return alert('Please review selected dates again. Some dates is not available for featuring your BLEX store.')
         }
     }
-
-    const price = Array.isArray(dates) ? (dates.length * wcfeatured.pricing.vendor).toFixed(2) : 0;
 
     return (
         <React.Fragment>
@@ -187,28 +202,17 @@ const FeatureVendorAdd = (props) => {
                     <form className="wcfm-vendor-featured-form wcfm-vendor-featured-store-form" method="POST">
                         <input type="hidden" name="_nonce_featured_vendor" value={props._nonce} />
 
-                        <fieldset className="wcfm-vendor-featured-fieldset wcfm-vendor-featured-fieldset-grid">
-                            <label>Category</label>
-                            <Categories name="feature_category" category={category} onChange={(category) => setState({ ...state, category })} />
+                        <table className="table-wcfm-form">
+                            <tr>
+                                <th>Date</th>
+                                <td>
+                                    <input ref={datepicker} type="text" className="wcfm-text" />
+                                    {Array.isArray(dates) && dates.map((date) => <input type="hidden" name="dates[]" value={date} />)}
+                                </td>
+                            </tr>
+                        </table>
 
-                            <label>Date</label>
-                            <input ref={datepicker} type="text" className="wcfm-text" />
-
-                            {(Array.isArray(dates) && dates.length > 0) &&
-                                <React.Fragment>
-                                    {dates.map(date => <input type="hidden" name="feature_dates[]" value={date} />)}
-                                    <label>Days</label>
-                                    <span>{dates.length}</span>
-
-                                    <label>Total Price</label>
-                                    <span>${price}</span>
-                                    <input type="hidden" name="price" value={price} />
-                                </React.Fragment>
-                            }
-
-                        </fieldset>
-                        <div className="gap-60" />
-                        <button className="wcfm_submit_button" onClick={onSubmit}>Activate Now</button>
+                        <PricingPackage pricing_id="vendor" package={state} onSubmit={onSubmit} onUpdate={on_update} dates={dates} />
                     </form>
                 </div>
             </div>
@@ -216,21 +220,77 @@ const FeatureVendorAdd = (props) => {
     )
 }
 
+
+const FeaturedDates = (props) => {
+    const products = Object.values(props.products);
+
+    const get_package_string = (packages) => {
+        return packages.map((pack) => {
+            if (pack === 'home_page') {
+                return 'Home';
+            }
+
+            if (pack === 'category') {
+                return 'Category';
+            }
+
+            if (pack === 'subcategory') {
+                return 'Sub Category';
+            }
+        })
+    }
+
+    return (
+        <table class="table-featured-products">
+            <caption>Your Featured Products</caption>
+            <thead>
+                <tr>
+                    <th>Dates</th>
+                    <th>#ID</th>
+                    <th>Name</th>
+                    <th>Package</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                </tr>
+            </thead>
+
+            {products.length == 0 &&
+                <tr>
+                    <td colSpan={5} style={{ textAlign: 'center' }}>No Products</td>
+                </tr>
+            }
+
+            {products.length > 0 && products.map((product) =>
+                <tr>
+                    <td>{moment(product.date).format('MMM DD, YYYY')}</td>
+                    <td>#{product.id}</td>
+                    <td>{product.post_title}</td>
+                    <td>{get_package_string(product.packages).join(', ')}</td>
+                    <td>{product.packages.includes('category') || product.packages.includes('subcategory') ? product.category_name : ''}</td>
+                    <td>{product.subcategory_name}</td>
+                </tr>
+            )}
+
+        </table>
+    );
+}
+
 const FeaturedProductForm = (props) => {
     const [product, setProduct] = useState({
         id: null,
         dates: [],
-        category: 95,
-        sub_category: null,
+        category: '',
+        subcategory: null,
         packages: ['home_page', 'category']
     });
 
-    const { id, category, sub_category, dates, packages } = product;
+    const { id, category, subcategory, dates, packages } = product;
 
     const datepicker = useRef(null);
 
     useEffect(() => {
-        let term_id = product.sub_category && product.sub_category.length ? product.sub_category : product.category;
+        let term_id = product.subcategory && product.subcategory.length ? product.subcategory : product.category;
+
         const disable_dates = props.category_dates.filter((item) => item.term_id == term_id & item.total >= wcfeatured.product_limit).map(date => date.feature_date)
 
         const picker = flatpickr(datepicker.current, {
@@ -241,16 +301,16 @@ const FeaturedProductForm = (props) => {
             disable: disable_dates,
             onChange: (selectedDates, datesStr) => {
                 datesStr = datesStr.split(',').map((date) => date.trim());
-                if ( !selectedDates.length ) {
+                if (!selectedDates.length) {
                     datesStr = [];
                 }
                 setProduct({ ...product, dates: datesStr })
             }
         })
 
-    }, [id, category, sub_category]);
+    }, [id, category, subcategory]);
 
-    const on_update = (values) => setProduct({...product, ...values})
+    const on_update = (values) => setProduct({ ...product, ...values })
 
 
     const on_submit = (e) => {
@@ -264,11 +324,11 @@ const FeaturedProductForm = (props) => {
             error = 'Please select feature dates';
         }
 
-        if ( packages.includes('category') &&  !category) {
+        if (packages.includes('category') && !category) {
             error = 'Please select a category';
         }
 
-        if ( packages.includes('sub_category') &&  !sub_category) {
+        if (packages.includes('subcategory') && !subcategory) {
             error = 'Please select a subcategory';
         }
 
@@ -304,12 +364,12 @@ const FeaturedProductForm = (props) => {
                             <th>Date</th>
                             <td>
                                 <input ref={datepicker} type="text" className="wcfm-text" />
-                                { Array.isArray(dates) && dates.map((date) => <input type="hidden" name="dates[]" value={date} />)}
+                                {Array.isArray(dates) && dates.map((date) => <input type="hidden" name="dates[]" value={date} />)}
                             </td>
                         </tr>
                     </table>
 
-                    <PricingPackage product={product} onSubmit={on_submit} onUpdate={on_update} dates={dates} />
+                    <PricingPackage package={product} onSubmit={on_submit} onUpdate={on_update} dates={dates} />
                 </form>
             </div>
         </div>
@@ -317,59 +377,6 @@ const FeaturedProductForm = (props) => {
 }
 
 
-const FeaturedProducts = (props) => {
-    const products = Object.values(props.products);
-
-    const get_package_string = (packages) => {
-        return packages.map((pack) => {
-            if ( pack === 'home_page') {
-                return 'Home';
-            }
-
-            if ( pack === 'category') {
-                return 'Category';
-            }
-
-            if ( pack === 'sub_category') {
-                return 'Sub Category';
-            }
-        })
-    }
-
-    return (
-        <table class="table-featured-products">
-            <caption>Your Featured Products</caption>
-            <thead>
-                <tr>
-                    <th>Dates</th>
-                    <th>#ID</th>
-                    <th>Name</th>
-                    <th>Package</th>
-                    <th>Category</th>
-                    <th>Sub Category</th>
-                </tr>
-            </thead>
-
-            {products.length == 0 &&
-                <tr>
-                    <td colSpan={5} style={{ textAlign: 'center' }}>No Products</td>
-                </tr>
-            }
-
-            {products.length > 0 && products.map((product) =>
-                <tr>
-                    <td>{moment(product.date).format('MMM DD, YYYY')}</td>
-                    <td>#{product.id}</td>
-                    <td>{product.post_title}</td>
-                    <td>{get_package_string(product.packages).join(', ')}</td>
-                    <td>{product.packages.includes('category') || product.packages.includes('sub_category') ? product.category_term_name : ''}</td>
-                    <td>{product.sub_category_term_name}</td>
-                </tr>
-            )}
-
-        </table>
-    );
-}
 
 const MultivendorFeatured = () => {
     const [state, setState] = useState({
@@ -394,11 +401,10 @@ const MultivendorFeatured = () => {
 
     return (
         <React.Fragment>
-            
-            {/* <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} /> */}
-            <FeaturedProducts products={feature_dates} />
+            <FeatureVendorAdd featured_dates={featured_dates} _nonce={state.nonce_vendor_featured} />
+
+            <FeaturedDates products={feature_dates} />
             <FeaturedProductForm category_dates={category_dates} products={session_products} _nonce={state.nonce_featured_products} />
-            
         </React.Fragment>
     )
 }
