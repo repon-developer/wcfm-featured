@@ -5,6 +5,11 @@
 .gap-50 {--height: 50px}
 .gap-60 {--height: 60px}
 
+#wc-multivendor-featured [type="checkbox"] {
+    appearance: auto!important;
+    -webkit-appearance: auto!important;
+}
+
 .wcfm-vendor-featured-form:before, .wcfm-vendor-featured-form:after {content: ""; display: block; clear: both; height: 0;}
 
 #wcfm-content {border: none!important;}
@@ -122,12 +127,44 @@ table.table-featured-products tfoot tr td:last-child {text-align: left;}
     background-color: #C99000;
 }
 
+#wc-multivendor-featured table.table-wcfm-form, #wc-multivendor-featured table.wcfm-feature-pricing {
+    margin-top: 0;
+    margin-bottom: -1px;
+    border-collapse: collapse;
+    border-color: #ccc!important;
+    border-style: solid;
+    border-width: 1px;
+    background-color: #fff!important;
+}
+
+
+table.wcfm-feature-pricing tr td, #wc-multivendor-featured .table-wcfm-form tr th, #wc-multivendor-featured .table-wcfm-form tr td {
+    border-width: 1px 0!important;
+    border-style: solid!important;
+    border-color: inherit!important;
+}
+
+#wc-multivendor-featured table.table-wcfm-form tr th {width: 140px;}
+
+#wc-multivendor-featured table.wcfm-feature-pricing tr th, #wc-multivendor-featured table.wcfm-feature-pricing tr td,
+#wc-multivendor-featured .table-wcfm-form tr th, #wc-multivendor-featured .table-wcfm-form tr td {padding: 12px 10px!important}
+
+table.wcfm-feature-pricing tr td:last-child {text-align: right; font-weight: bold;}
+
+#wc-multivendor-featured table.wcfm-feature-pricing tr td.checkbox-cell {width: 20px; padding-right: 0!important; text-align: right;}
+
+#wc-multivendor-featured .proccessing-fee td {font-weight: bold;}
 
 
 
+#wc-multivendor-featured table.table-wcfm-form input, #wc-multivendor-featured table.table-wcfm-form select {margin: 0!important; box-shadow: none;}
 
+#wc-multivendor-featured table.wcfm-feature-pricing select {width: auto; margin: 0 0 0 25px}
 
-
+#wc-multivendor-featured table.wcfm-feature-pricing .wcfm_submit_button {
+    float: left!important;
+    margin: 0!important;
+}
 
 /* REMOVE LATER */
 #wcfmmp-stores-lists {

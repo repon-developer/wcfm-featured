@@ -104,7 +104,7 @@ class WCFM_Multivendor_Featured {
             'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
 
             'vendor_products' => get_wcfm_feature_products(),
-            'session_products' => isset($_SESSION['wcfm_featured_products']) ? $_SESSION['wcfm_featured_products'] : [],
+            'session_product' => isset($_SESSION['wcfm_featured_product']) ? $_SESSION['wcfm_featured_product'] : [],
             'category_dates' => $category_dates,
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
         ]);

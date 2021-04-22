@@ -23,6 +23,7 @@ class WCFM_Multivendor_Featured_Payments {
         //fire event after successful payment
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
+        //$this->featured_info_payment_successfull();
     }
 
     function secured_wcfeatured_price($submission) {
@@ -30,7 +31,7 @@ class WCFM_Multivendor_Featured_Payments {
         return $submission;
     }
 
-    function featured_info_payment_successfull($submission) {
+    function featured_info_payment_successfull() {
         $current_form = $_SESSION['wcfm_featured_current_form'];
         $this->save_feature_data_vendor($current_form);
         $this->save_feature_data_products($current_form);
@@ -62,19 +63,19 @@ class WCFM_Multivendor_Featured_Payments {
     }
 
     function save_feature_data_products($current_form) {
-        if ( $current_form !== 'wcfm_feature_products') return;
+        if ( $current_form !== 'wcfm_feature_product') return;
 
         global $wpdb;
         $feature_products = get_wcfm_feature_table('products');
 
-        $category_dates = $_SESSION['wcfm_featured_products'];
+        $session_product = $_SESSION['wcfm_featured_product'];
+
+        $dates = $session_product['dates'];
 
         $products = [];
-        foreach ($category_dates as $key => $product) {            
-            while ($date = current($product['dates'])) {
-                next($product['dates']);
-                $products[] = $wpdb->prepare("(%d, %d, %d, %s)", $product['id'], $product['category'], $product['sub_category'], $date);
-            }
+        while ($date = current($dates)) {
+            next($dates);
+            $products[] = $wpdb->prepare("(%d, %d, %d, %s)", $session_product['id'], $session_product['category'], $session_product['sub_category'], $date);
         }
 
         $wpdb->query(sprintf("INSERT INTO $feature_products (product_id, term_id, sub_term, feature_date) VALUES %s", implode( ",\n", $products )));
@@ -106,11 +107,9 @@ class WCFM_Multivendor_Featured_Payments {
             return;
         }
 
-        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_products';
+        $_SESSION['wcfm_featured_current_form'] = 'wcfm_feature_product';
         $_SESSION['wcfm_featured_price'] = $_POST['price'];
-
-        $_SESSION['wcfm_featured_products'] = $_POST['products'];
-
+        $_SESSION['wcfm_featured_product'] = array('id' => $_POST['id'], 'category' => $_POST['category'], 'dates' => $_POST['dates']);
         wp_safe_redirect(get_wcfm_vendor_featured_url('wcfm-featured-checkout'));
         exit;
     }

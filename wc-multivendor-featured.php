@@ -42,3 +42,15 @@ add_action( 'wcfmmp_loaded', function(){
 	include_once 'featured-endpoint.php';
     new WCFM_Multivendor_Featured_Endpoint();
 });
+
+
+add_action( 'initd', function(){
+
+	$childs = get_terms( array(
+		'taxonomy' => 'product_cat',
+		'hide_empty' => false,
+	) );
+
+	var_dump($childs);
+	exit;
+});

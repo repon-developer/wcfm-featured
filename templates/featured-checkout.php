@@ -35,7 +35,7 @@ global $WCFM; ?>
                         include_once 'featured-checkout-vendor.php';
                     } 
 
-                    if ( 'wcfm_feature_products' == $current_form ) {
+                    if ( 'wcfm_feature_product' == $current_form ) {
                         include_once 'featured-checkout-products.php';
                     }
                 } ?>

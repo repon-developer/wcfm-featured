@@ -10,8 +10,8 @@ function get_wcfm_vendor_featured_url($endpoint = 'wcfm-featured') {
 }
 
 function get_wcfm_limit($type = 'vendor') {
-    if ( $type == 'products') return 12;
-    return 8;
+    if ( $type == 'products') return 3; //6
+    return 3; //8
 }
 
 function get_wcfm_featured_pricing() {
