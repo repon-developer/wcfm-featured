@@ -35,45 +35,76 @@
         <div class="wcfm_clearfix"></div>
 
         <?php
-        $featured_pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_pricing' ), ['vendor' => '', 'category' => '', 'subcategory' => '']);
+        $featured_vendor_pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_vendor_pricing' ), ['home_page' => '', 'category' => '', 'subcategory' => '']);
         $WCFM->wcfm_fields->wcfm_generate_form_field(array(
-            "wcfm_featured_pricing[vendor]" => array(
-                'label' => __('Price Per Day', 'wc-multivendor-featured') , 
+            "wcfm_featured_vendor_pricing[home_page]" => array(
+                'label' => __('Blexstore home page', 'wc-multivendor-featured') , 
                 'type' => 'text', 
                 'class' => 'wcfm-text wcfm_ele', 
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $featured_pricing['vendor'], 
-                'desc' => __('Price per day for featured store', 'wc-multivendor-featured'), 
-                ),
+                'value' => $featured_vendor_pricing['home_page'], 
+            ),
+        ) );
+
+        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
+            "wcfm_featured_vendor_pricing[category]" => array(
+                'label' => __('Category page', 'wc-multivendor-featured') , 
+                'type' => 'text', 
+                'class' => 'wcfm-text wcfm_ele', 
+                'label_class' => 'wcfm_title', 
+                'desc_class' => 'wcfm_page_options_desc', 
+                'value' => $featured_vendor_pricing['category'], 
+            ),
+        ) );
+
+        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
+            "wcfm_featured_vendor_pricing[subcategory]" => array(
+                'label' => __('Subcategory page', 'wc-multivendor-featured') , 
+                'type' => 'text', 
+                'class' => 'wcfm-text wcfm_ele', 
+                'label_class' => 'wcfm_title', 
+                'desc_class' => 'wcfm_page_options_desc', 
+                'value' => $featured_vendor_pricing['subcategory'], 
+            ),
         ) ); ?>
 
         <div class="wcfm_clearfix"></div>
         <h2><?php _e('Featured Product Pricing', 'wc-multivendor-featured'); ?></h2>
         <div class="wcfm_clearfix"></div>
         <?php
+        $featured_product_pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_product_pricing' ), ['home_page' => '', 'category' => '', 'subcategory' => '']);
         $WCFM->wcfm_fields->wcfm_generate_form_field(array(
-            "wcfm_featured_pricing[category]" => array(
-                'label' => __('Main Category Price', 'wc-multivendor-featured') , 
+            "wcfm_featured_product_pricing[home_page]" => array(
+                'label' => __('Home page', 'wc-multivendor-featured') , 
                 'type' => 'text', 
                 'class' => 'wcfm-text wcfm_ele', 
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $featured_pricing['category'], 
-                'desc' => __('Price per day for main category', 'wc-multivendor-featured'), 
-                ),
-        ) );        
-        
+                'value' => $featured_product_pricing['home_page'], 
+            ),
+        ) );
+
         $WCFM->wcfm_fields->wcfm_generate_form_field(array(
-            "wcfm_featured_pricing[subcategory]" => array(
-                'label' => __('Sub Category Price', 'wc-multivendor-featured') , 
+            "wcfm_featured_product_pricing[category]" => array(
+                'label' => __('Category page', 'wc-multivendor-featured') , 
                 'type' => 'text', 
                 'class' => 'wcfm-text wcfm_ele', 
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $featured_pricing['subcategory'], 
-                'desc' => __('Price per day for sub category', 'wc-multivendor-featured'), 
-                ),
+                'value' => $featured_product_pricing['category'], 
+            ),
+        ) );
+
+        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
+            "wcfm_featured_product_pricing[subcategory]" => array(
+                'label' => __('Subcategory page', 'wc-multivendor-featured') , 
+                'type' => 'text', 
+                'class' => 'wcfm-text wcfm_ele', 
+                'label_class' => 'wcfm_title', 
+                'desc_class' => 'wcfm_page_options_desc', 
+                'value' => $featured_product_pricing['subcategory'], 
+            ),
         ) );
 	    ?>
     </div>

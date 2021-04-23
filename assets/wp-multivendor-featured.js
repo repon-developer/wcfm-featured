@@ -39,13 +39,24 @@ const Categories = ({ name, value, childof, onChange }) => {
 }
 
 const PricingPackage = (props) => {
-    const [pricing, setPricing] = useState({
-        'home_page': 50.00,
-        'category': 25.00,
-        'subcategory': 15.00,
-    });
-
     const pricing_id = props.pricing_id ? props.pricing_id : Date.now();
+    const pricing = Object.assign({
+        home_page: {
+            price: 45.00,
+            title: 'Home Page'
+        },
+        category: {
+            price: 25.00,
+            title: 'Category Page'
+        },
+        subcategory: {
+            price: 15.00,
+            title: 'Subcategory Page'
+        },
+    }, props.pricing);
+
+    Object.keys(pricing).forEach((key) => pricing[key].price = parseFloat(pricing[key].price));
+
 
     const { category, subcategory, packages } = Object.assign({ category: '', subcategory: '', packages: [] }, props.package);
 
@@ -68,7 +79,7 @@ const PricingPackage = (props) => {
 
     const dates = Array.isArray(props.dates) ? props.dates : [];
 
-    const price = (packages.length ? packages.map((key) => pricing[key]).reduce((total, current) => total + current) : 0);
+    const price = (packages.length ? packages.map((key) => pricing[key].price).reduce((total, current) => total + current) : 0);
     const processing_fee = price * 5 / 100;
 
     const total_price = (price + processing_fee) * dates.length
@@ -76,6 +87,7 @@ const PricingPackage = (props) => {
     const date_strings = (dates) => {
         return dates.map(date => moment(date).format('MMM DD, YYYY')).join(', ');
     }
+
 
     return (
         <table className="wcfm-feature-pricing">
@@ -87,24 +99,24 @@ const PricingPackage = (props) => {
                 <td className="checkbox-cell">
                     <input id={`${pricing_id}check_home_page`} name="packages[]" value="home_page" type="checkbox" onChange={() => on_checkbox_update('home_page')} defaultChecked={packages.includes('home_page')} />
                 </td>
-                <td><label for={`${pricing_id}check_home_page`}>Home Page</label></td>
-                <td>{pricing.home_page.toFixed(2)} x {dates.length} = {(pricing.home_page * dates.length).toFixed(2)} USD</td>
+                <td><label for={`${pricing_id}check_home_page`}>{pricing.home_page.title}</label></td>
+                <td>{pricing.home_page.price.toFixed(2)} x {dates.length} = {(pricing.home_page.price * dates.length).toFixed(2)} USD</td>
             </tr>
 
             <tr>
                 <td className="checkbox-cell"><input id={`${pricing_id}check_category`} name="packages[]" value="category" type="checkbox" onChange={() => on_checkbox_update('category')} defaultChecked={packages.includes('category')} /></td>
-                <td><label for={`${pricing_id}check_category`}>Category Page</label> <Categories value={category} name="category" onChange={(category) => props.onUpdate({ category })} /></td>
-                <td>{pricing.category.toFixed(2)} x {dates.length} = {(pricing.category * dates.length).toFixed(2)} USD</td>
+                <td><label for={`${pricing_id}check_category`}>{pricing.category.title}</label> <Categories value={category} name="category" onChange={(category) => props.onUpdate({ category })} /></td>
+                <td>{pricing.category.price.toFixed(2)} x {dates.length} = {(pricing.category.price * dates.length).toFixed(2)} USD</td>
 
             </tr>
 
             <tr>
                 <td className="checkbox-cell"><input id={`${pricing_id}check_subcategory`} name="packages[]" value="subcategory" type="checkbox" onChange={() => on_checkbox_update('subcategory')} defaultChecked={packages.includes('subcategory')} /></td>
                 <td>
-                    <label for={`${pricing_id}check_subcategory`}>Subcategory Page</label>
+                    <label for={`${pricing_id}check_subcategory`}>{pricing.subcategory.title}</label>
                     {packages.includes('subcategory') && <Categories childof={category} value={subcategory} name="subcategory" onChange={(subcategory) => props.onUpdate({ subcategory })} />}
                 </td>
-                <td>{pricing.subcategory.toFixed(2)} x {dates.length} = {(pricing.subcategory * dates.length).toFixed(2)} USD</td>
+                <td>{pricing.subcategory.price.toFixed(2)} x {dates.length} = {(pricing.subcategory.price * dates.length).toFixed(2)} USD</td>
             </tr>
 
             <tr class="proccessing-fee">
@@ -125,11 +137,25 @@ const PricingPackage = (props) => {
 }
 
 
-
 const FeatureVendorAdd = (props) => {
     const datepicker = useRef(null);
+    const vendor_prices = wcfeatured.pricing.vendor;
 
-    const featured_dates = Array.isArray(props.featured_dates) ? props.featured_dates : [];
+    const pricing = {
+        home_page: {
+            title: 'Home Page',
+            price: vendor_prices.home_page || 50.00,
+        },
+
+        category: {
+            title: 'Category Page',
+            price: vendor_prices.category || 30.00
+        },
+        subcategory: {
+            title: 'Subcategory Page',
+            price: vendor_prices.subcategory || 20.00
+        },
+    }
 
     const [state, setState] = useState({
         category: '',
@@ -202,7 +228,7 @@ const FeatureVendorAdd = (props) => {
                             </tr>
                         </table>
 
-                        <PricingPackage pricing_id="vendor" package={state} onSubmit={onSubmit} onUpdate={on_update} dates={dates} />
+                        <PricingPackage pricing_id="vendor" pricing={pricing} package={state} onSubmit={onSubmit} onUpdate={on_update} dates={dates} />
                     </form>
                 </div>
             </div>
@@ -266,6 +292,24 @@ const FeaturedDates = (props) => {
 }
 
 const FeaturedProductForm = (props) => {
+    const product_prices = wcfeatured.pricing.product;
+
+    const pricing = {
+        home_page: {
+            title: 'Home Page',
+            price: product_prices.home_page || 50.00,
+        },
+
+        category: {
+            title: 'Category Page',
+            price: product_prices.category || 30.00
+        },
+        subcategory: {
+            title: 'Subcategory Page',
+            price: product_prices.subcategory || 20.00
+        },
+    }
+
     const [product, setProduct] = useState({
         id: null,
         dates: [],
@@ -354,7 +398,7 @@ const FeaturedProductForm = (props) => {
                         </tr>
                     </table>
 
-                    <PricingPackage package={product} onSubmit={on_submit} onUpdate={on_update} dates={dates} />
+                    <PricingPackage pricing={pricing} package={product} onSubmit={on_submit} onUpdate={on_update} dates={dates} />
                 </form>
             </div>
         </div>

@@ -52,7 +52,6 @@ class WCFM_Multivendor_Featured {
         wp_send_json([
             'nonce_vendor_featured' => wp_create_nonce('vendor_featured'),
             'nonce_featured_products' => wp_create_nonce('vendor_featured_products'),
-
             'featured_products' => get_wcfm_feature_products(),
         ]);
 
@@ -65,7 +64,8 @@ class WCFM_Multivendor_Featured {
 
 	function featured_pricing_update($wcfm_settings_form) {
         wcfm_update_option( 'wc_featured_payment_form', $wcfm_settings_form['wc_featured_payment_form'] );
-		wcfm_update_option( 'wcfm_featured_pricing', $wcfm_settings_form['wcfm_featured_pricing'] );
+		wcfm_update_option( 'wcfm_featured_vendor_pricing', $wcfm_settings_form['wcfm_featured_vendor_pricing'] );
+		wcfm_update_option( 'wcfm_featured_product_pricing', $wcfm_settings_form['wcfm_featured_product_pricing'] );
 	}   
 }
 

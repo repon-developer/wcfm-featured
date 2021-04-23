@@ -91,7 +91,7 @@ class WCFM_Multivendor_Featured_Endpoint {
             'products_filled_dates' => get_wcfm_products_dates(),
 
             'categories' => $get_terms,
-            'pricing' => get_wcfm_featured_pricing(),            
+            'pricing' => get_wcfm_feature_pricing(),            
             'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
         ]);
     }

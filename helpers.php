@@ -9,16 +9,9 @@ function get_wcfm_limit($type = 'vendor') {
     return 3; //8
 }
 
-function get_wcfm_featured_pricing() {
-    $pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_pricing' ), ['vendor' => 4.99, 'category' => 2.99, 'subcategory' => 2.29]);
-    array_walk($pricing, function(&$price){
-        if ( !$price) {
-            $price = 0;
-        }
-
-        $price = number_format($price, 2);
-    });
-
+function get_wcfm_feature_pricing() {
+    $pricing['vendor'] = wp_parse_args(wcfm_get_option( 'wcfm_featured_vendor_pricing' ), ['home_page' => 40, 'category' => 30, 'subcategory' => 20]);
+    $pricing['product'] = wp_parse_args(wcfm_get_option('wcfm_featured_product_pricing'), ['home_page' => 40, 'category' => 30, 'subcategory' => 20]);
     return $pricing;
 }
 
