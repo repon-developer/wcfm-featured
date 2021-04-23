@@ -18,8 +18,14 @@ class WCFM_Multivendor_Featured_Cron {
 
 	function check_featured_data_callback() {
 		$this->clear_data();
-		$this->update_vendor_feature();
-		$this->update_feature_products();
+
+		$users = get_users( ['role' => 'wcfm_vendor'] );
+
+		while ($user = current($users)) {
+			next($users);
+			$this->update_vendor_feature($user->ID);
+			$this->update_feature_products($user->ID);
+		}
 	}
 
 	function clear_data() {
@@ -50,26 +56,26 @@ class WCFM_Multivendor_Featured_Cron {
 		return $term_id;
 	}
 
-	function update_vendor_feature() {
-		$vendor_dates = array_filter(get_wcfm_feature_vendor(), function($date){
+	function update_vendor_feature($user_id) {
+		$vendor_dates = array_filter(get_wcfm_feature_vendor($user_id), function($date){
 			return $date['date'] == Date('Y-m-d');
 		});
 
-		array_walk($vendor_dates, function($item){
+		array_walk($vendor_dates, function($item) use ($user_id) {
 			$packages = $item['packages'];
 			while ($pack = current($packages)) {
 				next($packages);
-				update_user_meta(get_current_user_id(), 'wcfm_featured_' . $pack, $this->get_term_value($pack, $item));
+				update_user_meta($user_id, 'wcfm_featured_' . $pack, $this->get_term_value($pack, $item));
 			}
 		});
 	}
 
-	function update_feature_products() {
-		$feature_dates = array_filter(get_wcfm_feature_products(), function($date){
+	function update_feature_products($user_id) {
+		$feature_dates = array_filter(get_wcfm_feature_products($user_id), function($date){
 			return $date['date'] == Date('Y-m-d');
 		});
 
-		array_walk($feature_dates, function($item){
+		array_walk($feature_dates, function($item) {
 			$packages = $item['packages'];
 			while ($pack = current($packages)) {
 				next($packages);

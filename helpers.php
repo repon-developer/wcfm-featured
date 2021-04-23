@@ -15,11 +15,19 @@ function get_wcfm_feature_pricing() {
     return $pricing;
 }
 
-function get_wcfm_feature_vendor() {
-    $vendor_dates = get_user_meta( get_current_user_id(), 'wcfm_feature_vendor', true);
+function get_wcfm_feature_vendor($user_id = false) {
+    if ( !$user_id ) {
+        $user_id = get_current_user_id();
+    }
+
+    $vendor_dates = get_user_meta($user_id, 'wcfm_feature_vendor', true);
     if ( !is_array($vendor_dates)) {
         $vendor_dates = [];
     }
+
+    $vendor_dates = array_filter($vendor_dates, function($date){
+        return is_array($date);
+    });
 
     array_walk($vendor_dates, function(&$vendor) {
         $category = get_term( $vendor['category'] );
@@ -36,12 +44,21 @@ function get_wcfm_feature_vendor() {
     return $vendor_dates;
 }
 
-function get_wcfm_feature_products() {
-    $feature_dates = (array) get_user_meta( get_current_user_id(), 'wcfm_feature_products', true);
+function get_wcfm_feature_products($user_id = false) {
+    if ( !$user_id ) {
+        $user_id = get_current_user_id();
+    }
+
+    $feature_dates = (array) get_user_meta( $user_id, 'wcfm_feature_products', true);
 
     if ( !is_array($feature_dates)) {
         $feature_dates = [];
     }
+
+    $feature_dates = array_filter($feature_dates, function($product){
+        return is_array($product);
+    });
+    
 
     array_walk($feature_dates, function(&$product) {
         $product['post_title'] = html_entity_decode(get_the_title($product['id']));

@@ -157,7 +157,7 @@ const FeatureVendorAdd = (props) => {
         subcategory: {
             hide: true,
             title: 'Subcategory Page',
-            price: vendor_prices.subcategory || 20.00
+            price: 0
         },
     }
 

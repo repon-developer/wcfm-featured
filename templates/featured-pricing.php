@@ -35,7 +35,7 @@
         <div class="wcfm_clearfix"></div>
 
         <?php
-        $featured_vendor_pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_vendor_pricing' ), ['home_page' => '', 'category' => '', 'subcategory' => '']);
+        $featured_vendor_pricing = wp_parse_args(wcfm_get_option( 'wcfm_featured_vendor_pricing' ), ['home_page' => '', 'category' => '']);
         $WCFM->wcfm_fields->wcfm_generate_form_field(array(
             "wcfm_featured_vendor_pricing[home_page]" => array(
                 'label' => __('Blexstore home page', 'wc-multivendor-featured') , 
@@ -55,17 +55,6 @@
                 'label_class' => 'wcfm_title', 
                 'desc_class' => 'wcfm_page_options_desc', 
                 'value' => $featured_vendor_pricing['category'], 
-            ),
-        ) );
-
-        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
-            "wcfm_featured_vendor_pricing[subcategory]" => array(
-                'label' => __('Subcategory page', 'wc-multivendor-featured') , 
-                'type' => 'text', 
-                'class' => 'wcfm-text wcfm_ele', 
-                'label_class' => 'wcfm_title', 
-                'desc_class' => 'wcfm_page_options_desc', 
-                'value' => $featured_vendor_pricing['subcategory'], 
             ),
         ) ); ?>
 

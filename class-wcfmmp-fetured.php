@@ -71,8 +71,7 @@ class WCFM_Multivendor_Featured {
 
 
 add_action('wcfmmp_store_list_after_store_info', function($store_id){
-
-    $featured_vendor = get_user_meta( $store_id, 'featured_vendor', true);
+    $featured_vendor = get_user_meta( $store_id, 'wcfm_featured_home_page', true);
 
     if ( $featured_vendor ) {
         echo '<span class="wcfm-featured-store">Featured</span>';
