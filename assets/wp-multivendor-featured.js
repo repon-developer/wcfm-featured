@@ -51,6 +51,7 @@ const PricingPackage = (props) => {
         },
         subcategory: {
             price: 15.00,
+            hide: false,
             title: 'Subcategory Page'
         },
     }, props.pricing);
@@ -110,14 +111,16 @@ const PricingPackage = (props) => {
 
             </tr>
 
-            <tr>
-                <td className="checkbox-cell"><input id={`${pricing_id}check_subcategory`} name="packages[]" value="subcategory" type="checkbox" onChange={() => on_checkbox_update('subcategory')} defaultChecked={packages.includes('subcategory')} /></td>
-                <td>
-                    <label for={`${pricing_id}check_subcategory`}>{pricing.subcategory.title}</label>
-                    {packages.includes('subcategory') && <Categories childof={category} value={subcategory} name="subcategory" onChange={(subcategory) => props.onUpdate({ subcategory })} />}
-                </td>
-                <td>{pricing.subcategory.price.toFixed(2)} x {dates.length} = {(pricing.subcategory.price * dates.length).toFixed(2)} USD</td>
-            </tr>
+            {pricing.subcategory.hide !== true &&
+                <tr>
+                    <td className="checkbox-cell"><input id={`${pricing_id}check_subcategory`} name="packages[]" value="subcategory" type="checkbox" onChange={() => on_checkbox_update('subcategory')} defaultChecked={packages.includes('subcategory')} /></td>
+                    <td>
+                        <label for={`${pricing_id}check_subcategory`}>{pricing.subcategory.title}</label>
+                        {packages.includes('subcategory') && <Categories childof={category} value={subcategory} name="subcategory" onChange={(subcategory) => props.onUpdate({ subcategory })} />}
+                    </td>
+                    <td>{pricing.subcategory.price.toFixed(2)} x {dates.length} = {(pricing.subcategory.price * dates.length).toFixed(2)} USD</td>
+                </tr>
+            }
 
             <tr class="proccessing-fee">
                 <td colSpan={2}>Processing Fee (5%)</td>
@@ -143,7 +146,7 @@ const FeatureVendorAdd = (props) => {
 
     const pricing = {
         home_page: {
-            title: 'Home Page',
+            title: 'Blex store homepage',
             price: vendor_prices.home_page || 50.00,
         },
 
@@ -152,6 +155,7 @@ const FeatureVendorAdd = (props) => {
             price: vendor_prices.category || 30.00
         },
         subcategory: {
+            hide: true,
             title: 'Subcategory Page',
             price: vendor_prices.subcategory || 20.00
         },
