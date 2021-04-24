@@ -79,13 +79,15 @@ class WCFM_Multivendor_Featured_Cron {
 			$packages = $item['packages'];
 			while ($pack = current($packages)) {
 				next($packages);
-				update_post_meta( $item['id'], 'wcfm_featured_' . $pack, $this->get_term_value($pack, $item));				
+				update_post_meta( $item['id'], 'wcfm_featured_' . $pack, $this->get_term_value($pack, $item), $this->get_term_value($pack, $item));
 			}
 		});
 	}
 }
 
-add_action( 'initd', function(){
+add_action( 'init', function(){
+	if ( !isset($_GET['cron']) ) return;
+
 	do_action( 'check_featured_data' );
 	exit;
 });

@@ -24,6 +24,7 @@ class WCFM_Multivendor_Featured {
 
     private function load() {
         require_once WCFM_FEATURED_PATH . 'helpers.php';
+        require_once WCFM_FEATURED_PATH . 'filters.php';
 
         include_once 'featured-cron.php';
         $this->cron = new WCFM_Multivendor_Featured_Cron();
@@ -69,11 +70,14 @@ class WCFM_Multivendor_Featured {
 	}   
 }
 
-
 add_action('wcfmmp_store_list_after_store_info', function($store_id){
-    $featured_vendor = get_user_meta( $store_id, 'wcfm_featured_home_page', true);
+    $meta_key = !empty($_SESSION['wcfm_query_data']['key']) ? $_SESSION['wcfm_query_data']['key'] : false;
+    if (!$meta_key) return;
+    
+    $meta_value = get_user_meta( $store_id, $meta_key, true);
+    $session_value = !empty($_SESSION['wcfm_query_data']['value']) ? $_SESSION['wcfm_query_data']['value'] : '';
 
-    if ( $featured_vendor ) {
+    if ( $meta_value == $session_value ) {
         echo '<span class="wcfm-featured-store">Featured</span>';
     }
 }, 40);
