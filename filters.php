@@ -63,7 +63,6 @@ function wcfm_woocommerce_feature_product( $posts_clauses, $query ) {
         $meta_value = 'home';
         
         $object = get_queried_object(  );
-
         if ( is_a($object, 'WP_Term') ) {
             $meta_key = 'wcfm_featured_category';
             $meta_value = $object->term_id;
@@ -85,3 +84,25 @@ function wcfm_woocommerce_feature_product( $posts_clauses, $query ) {
 
 }
 add_filter( 'posts_clauses', 'wcfm_woocommerce_feature_product', 20, 2 );
+
+add_action( 'woocommerce_before_shop_loop_item', function(){
+    $meta_key = 'wcfm_featured_home_page';
+
+    $object_term = 'home';
+    
+    $object = get_queried_object();
+    if ( is_a($object, 'WP_Term') ) {
+        $object_term = $object->term_id;
+        $meta_key = 'wcfm_featured_category';
+
+        if ( $object->parent > 0 ) {
+            $meta_key = 'wcfm_featured_subcategory';
+        }
+    }
+
+    $term_id = get_post_meta( get_the_id(), $meta_key, true);
+
+    if ( $object_term == $term_id ) {
+        echo '<span class="wcfm-featured">Featured</span>';
+    }
+});
