@@ -1,37 +1,4 @@
 <?php
-
-function wcfm_featured_product_query($query) {
-    if ( is_admin() && $query->is_main_query() ) {
-        return;
-    }
-
-    if ( is_post_type_archive('product') && $query->is_main_query() ) {
-        $query->set('meta_query', array(
-            'relation' => 'OR',
-            'wcfm_featured_not' => array(
-                'key' => 'wcfm_featured_home_page',
-                'compare' => 'NOT EXISTS',
-            ),
-            'wcfm_featured' => array(
-                'key' => 'wcfm_featured_home_page',
-                'compare' => 'EXISTS',
-            )
-        ));
-    }
-}
-add_action( 'pre_get_posts', 'wcfm_featured_product_query' );
-
-add_filter( 'posts_orderby', function($orderby, $query ){
-    global $wpdb;
-    if ( is_post_type_archive('product') && $query->is_main_query() ) {
-        $orderby = "{$wpdb->postmeta}.meta_key DESC, " . $orderby;
-    }
-
-    return $orderby;
-}, 23, 2);
-
-
-
 add_filter( 'wcfmmp_vendor_list_args', function($args, $search_data){
     $category = $search_data['wcfmmp_store_category'];
 
@@ -71,3 +38,50 @@ add_action('pre_user_query', function($query){
         $query->query_orderby .= ',' . $orderby;
     }
 });
+
+
+add_action('wcfmmp_store_list_after_store_info', function($store_id){
+    $meta_key = !empty($_SESSION['wcfm_query_data']['key']) ? $_SESSION['wcfm_query_data']['key'] : false;
+    if (!$meta_key) return;
+    
+    $meta_value = get_user_meta( $store_id, $meta_key, true);
+    $session_value = !empty($_SESSION['wcfm_query_data']['value']) ? $_SESSION['wcfm_query_data']['value'] : '';
+
+    if ( $meta_value == $session_value ) {
+        echo '<span class="wcfm-featured-store">Featured</span>';
+    }
+}, 40);
+
+
+
+function wcfm_woocommerce_feature_product( $posts_clauses, $query ) {
+    
+    if ( !is_admin() && $query->is_main_query() && ( is_shop() || is_tax('product_cat') ) ) {  
+        global $wpdb;
+        
+        $meta_key = 'wcfm_featured_home_page';
+        $meta_value = 'home';
+        
+        $object = get_queried_object(  );
+
+        if ( is_a($object, 'WP_Term') ) {
+            $meta_key = 'wcfm_featured_category';
+            $meta_value = $object->term_id;
+
+            if ( $object->parent > 0 ) {
+                $meta_key = 'wcfm_featured_subcategory';
+            }
+        }
+
+        $posts_clauses['join'] .= sprintf(" LEFT JOIN (
+            SELECT DISTINCT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE meta_key='%s' AND meta_value = '%s'
+        ) AS wcfm_post1 ON ({$wpdb->posts}.ID = wcfm_post1.post_id)", $meta_key, $meta_value);
+
+        $posts_clauses['orderby'] = 'wcfm_post1.meta_key DESC, ' . $posts_clauses['orderby'];
+        return $posts_clauses;
+    }
+
+    return $posts_clauses;
+
+}
+add_filter( 'posts_clauses', 'wcfm_woocommerce_feature_product', 20, 2 );

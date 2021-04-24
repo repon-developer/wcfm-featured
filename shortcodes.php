@@ -31,7 +31,7 @@ class WCFM_Multivendor_Featured_Shortcodes {
         return $out;
     }
 
-
+    //This function use for shortcode where client want to show featured products in custom category
     function woocommerce_wcfm_featured_products_query($query_args, $attributes) {
         if ( !isset($attributes['wcfm_featured']) ) {
             return $query_args;
@@ -60,18 +60,27 @@ class WCFM_Multivendor_Featured_Shortcodes {
         return $query_args;
     }
 
+    //Show WCFM feature product instead of woocommerce feature product
     function woocommerce_featured_shortcode_products_query($query_args, $attributes) {
         if ( $attributes['visibility'] !== 'featured' ) return $query_args;
 
         $meta_query = array( 'key' => 'wcfm_featured_home_page', 'compare' => 'EXISTS' );
 
+
+        
         $query_args['meta_query'] = array($meta_query);
         $tax_query = array_filter($query_args['tax_query'], function($tax){
             return !($tax['taxonomy'] == 'product_visibility' && $tax['terms'] == 'featured' && $tax['operator'] == 'IN');
         });
 
+        //Remove default functionality of wordpress
+        unset($query_args['post__not_in']);
+        
+        
         $query_args['tax_query'] = $tax_query;
-       
+
+        $query_args['wcfm_feature_products'] = true;
+        
         return $query_args;
     }
 }
