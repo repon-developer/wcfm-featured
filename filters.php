@@ -53,16 +53,22 @@ add_action('wcfmmp_store_list_after_store_info', function($store_id){
 }, 40);
 
 
-
 function wcfm_woocommerce_feature_product( $posts_clauses, $query ) {
     
-    if ( !is_admin() && $query->is_main_query() && ( is_shop() || is_tax('product_cat') ) ) {  
+    if ( (!is_admin() && $query->is_main_query() && ( is_shop() || is_tax('product_cat') ) ) || defined('DOING_AJAX') && DOING_AJAX ) {  
         global $wpdb;
         
         $meta_key = 'wcfm_featured_home_page';
         $meta_value = 'home';
         
         $object = get_queried_object(  );
+
+        //For WP Filter plugin
+        $queryvars = json_decode(stripslashes($_REQUEST['filtersDataBackend']));
+        if ( !empty($queryvars[0]->settings[0])) {
+            $object = get_term( $queryvars[0]->settings[0] );            
+        }
+
         if ( is_a($object, 'WP_Term') ) {
             $meta_key = 'wcfm_featured_category';
             $meta_value = $object->term_id;
@@ -71,6 +77,9 @@ function wcfm_woocommerce_feature_product( $posts_clauses, $query ) {
                 $meta_key = 'wcfm_featured_subcategory';
             }
         }
+
+        set_query_var( 'wcfm_feature_key',  $meta_key);
+        set_query_var( 'wcfm_feature_value',  $meta_value);
 
         $posts_clauses['join'] .= sprintf(" LEFT JOIN (
             SELECT DISTINCT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE meta_key='%s' AND meta_value = '%s'
@@ -86,23 +95,14 @@ function wcfm_woocommerce_feature_product( $posts_clauses, $query ) {
 add_filter( 'posts_clauses', 'wcfm_woocommerce_feature_product', 20, 2 );
 
 add_action( 'woocommerce_before_shop_loop_item', function(){
-    $meta_key = 'wcfm_featured_home_page';
+    global $wp_query;
+    $meta_value = json_decode(stripslashes($_REQUEST['queryvars']))->product_category_id;
 
-    $object_term = 'home';
-    
-    $object = get_queried_object();
-    if ( is_a($object, 'WP_Term') ) {
-        $object_term = $object->term_id;
-        $meta_key = 'wcfm_featured_category';
-
-        if ( $object->parent > 0 ) {
-            $meta_key = 'wcfm_featured_subcategory';
-        }
-    }
+    $meta_key = get_query_var( 'wcfm_feature_key');
+    $meta_value = get_query_var( 'wcfm_feature_value', $meta_value);
 
     $term_id = get_post_meta( get_the_id(), $meta_key, true);
-
-    if ( $object_term == $term_id ) {
+    if ( $meta_value == $term_id ) {
         echo '<span class="wcfm-featured">Featured</span>';
     }
 });
