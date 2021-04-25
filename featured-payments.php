@@ -20,12 +20,13 @@ class WCFM_Multivendor_Featured_Payments {
         add_action( 'init', [$this, 'create_session_for_vendor']);
         add_action( 'init', [$this, 'create_session_for_products']);
 
-        //fire event after successful payment
-        add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
         //add_filter('wppayform/create_submission_data', [$this, 'secured_wcfeatured_price']);
 
+        //fire event after successful payment
+        add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
+
         add_action( 'init', function(){
-            //$this->save_feature_data_vendor('wcfm_feature_vendor');
+            //$this->send_confirmation_email();
         });        
     }
 
@@ -34,13 +35,17 @@ class WCFM_Multivendor_Featured_Payments {
         return $submission;
     }
 
-    function featured_info_payment_successfull() {
+    function featured_info_payment_successfull($submission) {
         $current_form = $_SESSION['wcfm_featured_current_form'];
         $this->save_feature_data_vendor($current_form);
         $this->save_feature_data_products($current_form);
+        //$this->send_confirmation_email($submission);
 
         unset($_SESSION['wcfm_featured_price']);
         unset($_SESSION['wcfm_featured_current_form']);
+
+        unset($_SESSION['wcfm_feature_vendor']);
+        unset($_SESSION['wcfm_featured_product']);
 
         if ( isset($_REQUEST['wpf_action']) && $_REQUEST['wpf_action'] == 'stripe_hosted_success' ) {
             wp_safe_redirect(get_wcfm_vendor_featured_url());
@@ -68,7 +73,6 @@ class WCFM_Multivendor_Featured_Payments {
         }
 
         update_user_meta(get_current_user_id(), 'wcfm_feature_vendor', $vendor_dates);
-        unset($_SESSION['wcfm_feature_vendor']);
     }
 
     function save_feature_data_products($current_form) {
@@ -91,9 +95,21 @@ class WCFM_Multivendor_Featured_Payments {
         
         $feature_products = array_merge($feature_products, $feature_dates);
         update_user_meta(get_current_user_id(), 'wcfm_feature_products', $feature_products);
-        unset($_SESSION['wcfm_featured_product']);
     }
 
+    function send_confirmation_email($submission) {    
+        $feature_product = sanitize_wcfm_products($_SESSION['wcfm_featured_product']);
+        $feature_cost = $submission->payment_total / 100;
+
+        ob_start();
+        include_once 'templates/email-payment-confirm.php';
+        $email_content = ob_get_clean();        
+        wp_mail( $submission->customer_email, 'Paid - '. $feature_product['post_title'], $email_content );
+
+
+        exit;
+        
+    }
 
     function create_session_for_vendor() {
         if (!wp_verify_nonce($_POST['_nonce_featured_vendor'], 'vendor_featured') ) {

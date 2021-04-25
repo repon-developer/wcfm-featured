@@ -44,6 +44,24 @@ function get_wcfm_feature_vendor($user_id = false) {
     return $vendor_dates;
 }
 
+function sanitize_wcfm_products($product) {
+    if ( !is_array($product) ) return [];
+
+    $product['post_title'] = html_entity_decode(get_the_title($product['id']));
+
+    $category = get_term( $product['category'] );
+    if ( is_a($category, 'WP_Term') ) {
+        $product['category_name'] = html_entity_decode($category->name);
+    }
+
+    $subcategory = get_term( $product['subcategory'] );
+    if ( is_a($subcategory, 'WP_Term') ) {
+        $product['subcategory_name'] = html_entity_decode($subcategory->name);
+    }
+
+    return $product;
+}
+
 function get_wcfm_feature_products($user_id = false) {
     if ( !$user_id ) {
         $user_id = get_current_user_id();
@@ -61,17 +79,7 @@ function get_wcfm_feature_products($user_id = false) {
     
 
     array_walk($feature_dates, function(&$product) {
-        $product['post_title'] = html_entity_decode(get_the_title($product['id']));
-
-        $category = get_term( $product['category'] );
-        if ( is_a($category, 'WP_Term') ) {
-            $product['category_name'] = html_entity_decode($category->name);
-        }
-
-        $subcategory = get_term( $product['subcategory'] );
-        if ( is_a($subcategory, 'WP_Term') ) {
-           $product['subcategory_name'] = html_entity_decode($subcategory->name);
-        }
+        $product = sanitize_wcfm_products($product);
     });
 
     return array_filter($feature_dates, function($date){
