@@ -16,7 +16,7 @@ const get_sub_categories = (parent) => {
     return parent && parent > 0 ? categories.filter(cat => cat.parent == parent) : [];
 }
 
-const Categories = ({ name, value, childof, onChange }) => {
+const Categories = ({ name, value, childof, onChange, product_cats }) => {
     const on_update = (e) => {
         if (typeof onChange === 'function') {
             onChange(e.target.value)
@@ -26,6 +26,10 @@ const Categories = ({ name, value, childof, onChange }) => {
     let categories = get_sub_categories(childof);
     if (childof === undefined) {
         categories = main_category
+    }
+
+    if ( Array.isArray(product_cats) ) {
+        categories = categories.filter((cat) => product_cats.includes(cat.term_id) );
     }
 
     return (
@@ -58,8 +62,7 @@ const PricingPackage = (props) => {
 
     Object.keys(pricing).forEach((key) => pricing[key].price = parseFloat(pricing[key].price));
 
-
-    const { category, subcategory, packages } = Object.assign({ category: '', subcategory: '', packages: [] }, props.package);
+    const { id, category, subcategory, packages } = Object.assign({ category: '', subcategory: '', packages: [] }, props.package);
 
     const on_submit = (e) => {
         if (typeof props.onSubmit === 'function') {
@@ -89,6 +92,16 @@ const PricingPackage = (props) => {
         return dates.map(date => moment(date).format('MMM DD, YYYY')).join(', ');
     }
 
+    let product_cats = [];    
+
+    const product = products.find((product) =>{
+        return product.id == id;
+    });
+
+    if (typeof product !== 'undefined' ) {
+        product_cats = product.product_cats;
+    }
+
 
     return (
         <table className="wcfm-feature-pricing">
@@ -106,7 +119,7 @@ const PricingPackage = (props) => {
 
             <tr>
                 <td className="checkbox-cell"><input id={`${pricing_id}check_category`} name="packages[]" value="category" type="checkbox" onChange={() => on_checkbox_update('category')} defaultChecked={packages.includes('category')} /></td>
-                <td><label for={`${pricing_id}check_category`}>{pricing.category.title}</label> <Categories value={category} name="category" onChange={(category) => props.onUpdate({ category })} /></td>
+                <td><label for={`${pricing_id}check_category`}>{pricing.category.title}</label> <Categories product_cats={product_cats} value={category} name="category" onChange={(category) => props.onUpdate({ category })} /></td>
                 <td>{pricing.category.price.toFixed(2)} x {dates.length} = {(pricing.category.price * dates.length).toFixed(2)} USD</td>
 
             </tr>
@@ -116,7 +129,7 @@ const PricingPackage = (props) => {
                     <td className="checkbox-cell"><input id={`${pricing_id}check_subcategory`} name="packages[]" value="subcategory" type="checkbox" onChange={() => on_checkbox_update('subcategory')} defaultChecked={packages.includes('subcategory')} /></td>
                     <td>
                         <label for={`${pricing_id}check_subcategory`}>{pricing.subcategory.title}</label>
-                        {packages.includes('subcategory') && <Categories childof={category} value={subcategory} name="subcategory" onChange={(subcategory) => props.onUpdate({ subcategory })} />}
+                        {packages.includes('subcategory') && <Categories product_cats={product_cats} childof={category} value={subcategory} name="subcategory" onChange={(subcategory) => props.onUpdate({ subcategory })} />}
                     </td>
                     <td>{pricing.subcategory.price.toFixed(2)} x {dates.length} = {(pricing.subcategory.price * dates.length).toFixed(2)} USD</td>
                 </tr>
@@ -387,7 +400,7 @@ const FeaturedProductForm = (props) => {
                                 <select defaultValue={id} name="id" className="wcfm-select" onChange={(e) => setProduct({ ...product, id: e.target.value })} >
                                     <option value="">Select a product</option>
                                     {Array.isArray(products) && products.map((product) => {
-                                        return <option value={product.ID}>{product.post_title}</option>
+                                        return <option value={product.id}>{product.post_title}</option>
                                     })}
                                 </select>
                             </td>

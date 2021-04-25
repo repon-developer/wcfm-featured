@@ -71,6 +71,16 @@ class WCFM_Multivendor_Featured_Endpoint {
     public function wcfm_customers_load_scripts( $end_point ) {
         if ( 'wcfm-featured' !== $end_point) return;
 
+        $products = wc_get_products(['limit' => -1]);
+        array_walk($products, function(&$product) {
+            $id = $product->id;
+            $product = array(
+                'id' => $id,
+                'post_title' => html_entity_decode(get_the_title($id)),
+                'product_cats' => array_column((array)get_the_terms( $id, 'product_cat'), 'term_id') 
+            );
+        });
+
         $get_terms = get_terms( 'product_cat', array('hide_empty' => false) );
         array_walk($get_terms, function(&$term){
             $term->name = html_entity_decode($term->name);
@@ -92,7 +102,7 @@ class WCFM_Multivendor_Featured_Endpoint {
 
             'categories' => $get_terms,
             'pricing' => get_wcfm_feature_pricing(),            
-            'products' => get_posts( ['post_type' => 'product', 'posts_per_page' => -1, 'author' => get_current_user_id()] ),
+            'products' => $products
         ]);
     }
 
