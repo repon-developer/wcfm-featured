@@ -1,8 +1,15 @@
 <?php extract($email_vars);
-$on_blex_store = in_array('home_page', $packages) ? 'Yes' : 'No'; ?>
+$on_blex_store = in_array('home_page', $packages) ? 'Yes' : 'No';
 
-<h3>You have successfully purchased</h3>
-<p>We will aprove your store within our BLEX store list.</p>
+$date_string = implode(', ', $dates); 
+
+$user = wp_get_current_user(  );
+$store_name     = wcfm_get_vendor_store_name( get_current_user_id(  ) );
+$store_name     = empty( $store_name ) ? $user->display_name : $store_name;
+
+?>
+
+<p>Thank you "<b><?php echo $store_name; ?></b>" for featuring your store on the BLEX Vendor store list. Your store will be featured on the <?php echo $date_string; ?> you selected.</p>
 
 <table class="table-email-payment-confirm" style="border:1px solid #ccc;border-collapse:collapse">
     <tr>
@@ -21,3 +28,5 @@ $on_blex_store = in_array('home_page', $packages) ? 'Yes' : 'No'; ?>
         <td style="padding: 8px 14px; border:1px solid #ccc"><b>$<?php echo $purchase_value ?></b></td>
     </tr>
 </table>
+
+<p>If you have any questions, please contact us at info@blexshoppes.com</p>

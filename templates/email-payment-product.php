@@ -1,7 +1,7 @@
 <?php extract($email_vars); ?>
 
 <h3>You have successfully purchased</h3>
-<p>We will aprove your feature product your within an hour.</p>
+<p>We will aprove your feature product your within 24 hours.</p>
 
 <table class="table-email-payment-confirm" style="border:1px solid #ccc;border-collapse:collapse">
     <tr>

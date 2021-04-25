@@ -101,11 +101,8 @@ class WCFM_Multivendor_Featured_Payments {
         $template = 'templates/email-payment-product.php';
         $session_key = 'wcfm_featured_product'; 
         $email_vars = $_SESSION[$session_key];
-        $subject = '';
-        
         
         if ( $current_form == 'wcfm_feature_vendor') {
-            $subject = 'Paid - Feature your BLEX store';
             $session_key = 'wcfm_feature_vendor';
             $template = 'templates/email-payment-vendor.php';
 
@@ -119,7 +116,6 @@ class WCFM_Multivendor_Featured_Payments {
 
         if ( $current_form == 'wcfm_feature_product') {
             $email_vars = sanitize_wcfm_products($email_vars);
-            $subject = 'Paid - '. $email_vars['post_title'];
         }
 
         $purchase_value = $submission->payment_total / 100;
@@ -129,8 +125,10 @@ class WCFM_Multivendor_Featured_Payments {
         $email_content = ob_get_clean();
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
+        $headers[] = 'From: Blex Shop <admin@blexshoppes.com>';
+    
 
-        wp_mail( $submission->customer_email, $subject, $email_content, $headers );        
+        wp_mail( $submission->customer_email, 'Feature', $email_content, $headers );        
     }
 
     function create_session_for_vendor() {

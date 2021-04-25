@@ -1,12 +1,3 @@
-(function ($) {
-    $(".wc-multivendor-featured-daftepicker").flatpickr({
-        minDate: 'today'
-    });
-
-
-
-})(jQuery);
-
 const { useState, useEffect, useRef } = React;
 const { categories, products, vendor_filled_dates, products_filled_dates, product_limit } = wcfeatured;
 
@@ -339,7 +330,7 @@ const FeaturedProductForm = (props) => {
 
     useEffect(() => {
         flatpickr(datepicker.current, {
-            minDate: 'today',
+            minDate: moment().add(1,'days').format(),
             mode: "multiple",
             dateFormat: "Y-m-d",
             defaultDate: dates,
