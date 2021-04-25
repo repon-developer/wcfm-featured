@@ -92,8 +92,7 @@ const PricingPackage = (props) => {
         return dates.map(date => moment(date).format('MMM DD, YYYY')).join(', ');
     }
 
-    let product_cats = [];    
-
+    let product_cats = false;
     const product = products.find((product) =>{
         return product.id == id;
     });
@@ -101,7 +100,6 @@ const PricingPackage = (props) => {
     if (typeof product !== 'undefined' ) {
         product_cats = product.product_cats;
     }
-
 
     return (
         <table className="wcfm-feature-pricing">
@@ -421,8 +419,6 @@ const FeaturedProductForm = (props) => {
         </div>
     )
 }
-
-
 
 const MultivendorFeatured = () => {
     const [state, setState] = useState({

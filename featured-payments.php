@@ -26,7 +26,7 @@ class WCFM_Multivendor_Featured_Payments {
         add_action('wppayform/form_payment_success', [$this, 'featured_info_payment_successfull'], 23);
 
         add_action( 'init', function(){
-            //$this->send_confirmation_email();
+            //$this->send_confirmation_email([], 'wcfm_feature_vendor');
         });        
     }
 
@@ -39,7 +39,7 @@ class WCFM_Multivendor_Featured_Payments {
         $current_form = $_SESSION['wcfm_featured_current_form'];
         $this->save_feature_data_vendor($current_form);
         $this->save_feature_data_products($current_form);
-        //$this->send_confirmation_email($submission);
+        $this->send_confirmation_email($submission, $current_form);
 
         unset($_SESSION['wcfm_featured_price']);
         unset($_SESSION['wcfm_featured_current_form']);
@@ -97,18 +97,40 @@ class WCFM_Multivendor_Featured_Payments {
         update_user_meta(get_current_user_id(), 'wcfm_feature_products', $feature_products);
     }
 
-    function send_confirmation_email($submission) {    
-        $feature_product = sanitize_wcfm_products($_SESSION['wcfm_featured_product']);
-        $feature_cost = $submission->payment_total / 100;
+    function send_confirmation_email($submission, $current_form) { 
+        $template = 'templates/email-payment-product.php';
+        $session_key = 'wcfm_featured_product'; 
+        $email_vars = $_SESSION[$session_key];
+        $subject = '';
+        
+        
+        if ( $current_form == 'wcfm_feature_vendor') {
+            $subject = 'Paid - Feature your BLEX store';
+            $session_key = 'wcfm_feature_vendor';
+            $template = 'templates/email-payment-vendor.php';
+
+            $email_vars = $_SESSION[$session_key];
+
+            $category = get_term( $email_vars['category'] );
+            if ( is_a($category, 'WP_Term') ) {
+                $email_vars['category_name'] = html_entity_decode($category->name);
+            }
+        }
+
+        if ( $current_form == 'wcfm_feature_product') {
+            $email_vars = sanitize_wcfm_products($email_vars);
+            $subject = 'Paid - '. $email_vars['post_title'];
+        }
+
+        $purchase_value = $submission->payment_total / 100;
 
         ob_start();
-        include_once 'templates/email-payment-confirm.php';
-        $email_content = ob_get_clean();        
-        wp_mail( $submission->customer_email, 'Paid - '. $feature_product['post_title'], $email_content );
+        include_once $template;
+        $email_content = ob_get_clean();
 
+        $headers = array('Content-Type: text/html; charset=UTF-8');
 
-        exit;
-        
+        wp_mail( $submission->customer_email, $subject, $email_content, $headers );        
     }
 
     function create_session_for_vendor() {
