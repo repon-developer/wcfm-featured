@@ -92,62 +92,100 @@ function get_wcfm_feature_products($user_id = false) {
     });
 }
 
-function get_wcfm_vendor_dates() {
-    $featured_vendor = array_filter(get_wcfm_feature_vendor(), function($item){
-        return $item['date'] >= Date('Y-m-d');
+
+function get_wcfm_category_dates($dates) {
+    $cate_dates = [];    
+    foreach ($dates as $key => $cat) {
+        $cate_dates[$cat['category']][] = $cat;
+    }
+
+    array_walk($cate_dates, function(&$dates){        
+        $dates = array_count_values(array_column($dates, 'date'));
     });
 
-    $vendor_filled_dates = [];
+    return $cate_dates;
+}
+
+function get_wcfm_vendor_filled_dates() {
+    $users = get_users( ['role' => 'wcfm_vendor'] );
+
+    $vendor_dates = [];
+    foreach ($users as $key => $user) {
+        $user_dates = get_user_meta($user->ID, 'wcfm_feature_vendor', true);
+        if (!is_array($user_dates)) continue;
+
+        while ($date = current($user_dates)) {
+            next($user_dates);
+            $vendor_dates[] = $date;
+        }
+    }
+
+    $featured_vendor = array_filter($vendor_dates, function($item){
+        return $item['date'] >= Date('Y-m-d');
+    });
 
     $home_page = array_filter($featured_vendor, function($date){
         return in_array('home_page', $date['packages']);
     });
 
-    $vendor_filled_dates['home_page'] = array_count_values(array_column($home_page, 'date'));
+    $filled_dates['home_page'] = array_count_values(array_column($home_page, 'date'));
 
-    
+    //get categories and dates
     $category = array_filter($featured_vendor, function($date){
         return in_array('category', $date['packages']);
     });
 
-    $vendor_filled_dates['category'] = array_count_values(array_column($category, 'date'));
+    $filled_dates['category'] = get_wcfm_category_dates($category);
     
-    
+
+    //get subcategories and dates    
     $subcategory = array_filter($featured_vendor, function($date){
         return in_array('subcategory', $date['packages']);
     });
 
-    $vendor_filled_dates['subcategory'] = array_count_values(array_column($subcategory, 'date'));
+    $filled_dates['subcategory'] = get_wcfm_category_dates($subcategory);
 
-    return $vendor_filled_dates;
+    return $filled_dates;
 }
 
-function get_wcfm_products_dates() {
-    $featured_products = array_filter(get_wcfm_feature_products(), function($item){
+function get_wcfm_products_filled_dates() {
+    $users = get_users( ['role' => 'wcfm_vendor'] );
+
+    $product_dates = [];
+    foreach ($users as $key => $user) {
+        $user_dates = get_user_meta($user->ID, 'wcfm_feature_products', true);
+        if (!is_array($user_dates)) continue;
+
+        while ($date = current($user_dates)) {
+            next($user_dates);
+            $product_dates[] = $date;
+        }
+    }
+
+    $featured_products = array_filter($product_dates, function($item){
         return $item['date'] >= Date('Y-m-d');
     });
 
-    $products_filled_dates = [];
-
+    $filled_dates = [];
     $home_page = array_filter($featured_products, function($date){
         return in_array('home_page', $date['packages']);
     });
 
-    $products_filled_dates['home_page'] = array_count_values(array_column($home_page, 'date'));
+    $filled_dates['home_page'] = array_count_values(array_column($home_page, 'date'));
+
 
     
     $category = array_filter($featured_products, function($date){
         return in_array('category', $date['packages']);
     });
 
-    $products_filled_dates['category'] = array_count_values(array_column($category, 'date'));
-    
+    $filled_dates['category'] = get_wcfm_category_dates($category);
     
     $subcategory = array_filter($featured_products, function($date){
         return in_array('subcategory', $date['packages']);
     });
 
-    $products_filled_dates['subcategory'] = array_count_values(array_column($subcategory, 'date'));
+    $filled_dates['subcategory'] = get_wcfm_category_dates($subcategory);
 
-    return $products_filled_dates;
+    return $filled_dates;
 }

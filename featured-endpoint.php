@@ -97,8 +97,8 @@ class WCFM_Multivendor_Featured_Endpoint {
             'vendor_limit' => get_wcfm_limit(),
             'product_limit' => get_wcfm_limit('products'),
 
-            'vendor_filled_dates' => get_wcfm_vendor_dates(),
-            'products_filled_dates' => get_wcfm_products_dates(),
+            'vendor_filled_dates' => get_wcfm_vendor_filled_dates(),
+            'products_filled_dates' => get_wcfm_products_filled_dates(),
 
             'categories' => $get_terms,
             'pricing' => get_wcfm_feature_pricing(),

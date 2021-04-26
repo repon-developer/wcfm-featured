@@ -74,8 +74,6 @@ const PricingPackage = (props) => {
 
     const dates = Array.isArray(props.dates) ? props.dates : [];
 
-    console.log(wcfeatured)
-
     const price = (packages.length ? packages.map((key) => pricing[key].price).reduce((total, current) => total + current) : 0);
     const processing_fee = price * wcfeatured.pricing.processing_fee / 100;
 
@@ -203,6 +201,33 @@ const FeatureVendorAdd = (props) => {
 
         if (packages.includes('subcategory') && !subcategory) {
             error = 'Please select a subcategory';
+        }
+        
+        if ( packages.includes('category')) {
+            let filled_dates = vendor_filled_dates.category[category];
+            if ( typeof filled_dates !== 'object' ) {
+                filled_dates = {};
+            }
+
+            const exists = dates.find((date) => {
+                return filled_dates[date] && filled_dates[date] >= vendor_limit
+            })
+
+            if ( exists !== undefined ) {
+                error = moment(exists).format('MMM DD, YYYY') + ' this date is not available for feature your BLEX store to category section.'
+            }
+        }
+
+        if ( packages.includes('home_page')) {
+            const filled_dates = vendor_filled_dates.home_page
+
+            const exists = dates.find((date) => {
+                return filled_dates[date] && filled_dates[date] >= vendor_limit
+            })
+
+            if ( exists !== undefined ) {
+                error = moment(exists).format('MMM DD, YYYY') + ' this date is not available for feature your BLEX store.'
+            }
         }
 
         if (error) {
@@ -367,6 +392,48 @@ const FeaturedProductForm = (props) => {
 
         if (packages.includes('subcategory') && !subcategory) {
             error = 'Please select a subcategory';
+        }
+
+        if ( packages.includes('subcategory')) {
+            let filled_dates = products_filled_dates.subcategory[category];
+            if ( typeof filled_dates !== 'object' ) {
+                filled_dates = {};
+            }
+
+            const exists = dates.find((date) => {
+                return filled_dates[date] && filled_dates[date] >= product_limit
+            })
+
+            if ( exists !== undefined ) {
+                error = moment(exists).format('MMM DD, YYYY') + ' this date is not available for feature your product in the selected subcategory.'
+            }
+        }
+
+        if ( packages.includes('category')) {
+            let filled_dates = products_filled_dates.category[category];
+            if ( typeof filled_dates !== 'object' ) {
+                filled_dates = {};
+            }
+
+            const exists = dates.find((date) => {
+                return filled_dates[date] && filled_dates[date] >= product_limit
+            })
+
+            if ( exists !== undefined ) {
+                error = moment(exists).format('MMM DD, YYYY') + ' this date is not available for feature your product in the selected category.'
+            }
+        }
+
+        if ( packages.includes('home_page')) {
+            const filled_dates = products_filled_dates.home_page
+
+            const exists = dates.find((date) => {
+                return filled_dates[date] && filled_dates[date] >= product_limit
+            })
+
+            if ( exists !== undefined ) {
+                error = moment(exists).format('MMM DD, YYYY') + ' this date is not available for feature your product on home page.'
+            }
         }
 
         if (error) {

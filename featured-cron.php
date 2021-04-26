@@ -29,6 +29,7 @@ class WCFM_Multivendor_Featured_Cron {
 	}
 
 	function clear_data() {
+		error_log("WCFM - Clearing data");
 		global $wpdb;
 		$packages = ['home_page', 'category', 'subcategory'];
 		foreach ($packages as $key => $package) {
