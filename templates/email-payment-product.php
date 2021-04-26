@@ -1,7 +1,15 @@
-<?php extract($email_vars); ?>
+<?php extract($email_vars);
 
-<h3>You have successfully purchased</h3>
-<p>We will aprove your feature product your within 24 hours.</p>
+$date_string = implode(', ', $dates); 
+
+$user = wp_get_current_user(  );
+$store_name     = wcfm_get_vendor_store_name( get_current_user_id(  ) );
+$store_name     = empty( $store_name ) ? $user->display_name : $store_name;
+
+?>
+
+<p>Thank you "<b><?php echo $store_name; ?></b>" for featuring your product(s) on BLEX. Please allow us 24 hours to approve your product(s). 
+Once approved, your product(s) will be featured on <?php echo $date_string; ?>.</p>
 
 <table class="table-email-payment-confirm" style="border:1px solid #ccc;border-collapse:collapse">
     <tr>
@@ -24,3 +32,5 @@
         <td style="padding: 8px 14px; border:1px solid #ccc"><b>$<?php echo $purchase_value ?></b></td>
     </tr>
 </table>
+
+<p>If you have any questions, please contact us at Info@blexshoppes.com</p>

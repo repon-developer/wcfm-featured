@@ -67,5 +67,7 @@ class WCFM_Multivendor_Featured {
         wcfm_update_option( 'wc_featured_payment_form', $wcfm_settings_form['wc_featured_payment_form'] );
 		wcfm_update_option( 'wcfm_featured_vendor_pricing', $wcfm_settings_form['wcfm_featured_vendor_pricing'] );
 		wcfm_update_option( 'wcfm_featured_product_pricing', $wcfm_settings_form['wcfm_featured_product_pricing'] );
+		wcfm_update_option( 'wcfm_featured_processing_fee', $wcfm_settings_form['wcfm_featured_processing_fee'] );
+		wcfm_update_option( 'wcfm_featured_limit', $wcfm_settings_form['wcfm_featured_limit'] );
 	}   
 }

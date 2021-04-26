@@ -101,7 +101,7 @@ class WCFM_Multivendor_Featured_Endpoint {
             'products_filled_dates' => get_wcfm_products_dates(),
 
             'categories' => $get_terms,
-            'pricing' => get_wcfm_feature_pricing(),            
+            'pricing' => get_wcfm_feature_pricing(),
             'products' => $products
         ]);
     }

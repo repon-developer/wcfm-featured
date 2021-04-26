@@ -1,5 +1,5 @@
 const { useState, useEffect, useRef } = React;
-const { categories, products, vendor_filled_dates, products_filled_dates, product_limit } = wcfeatured;
+const { categories, products, vendor_filled_dates, products_filled_dates, vendor_limit, product_limit} = wcfeatured;
 
 const main_category = categories.filter(cat => cat.parent == 0);
 
@@ -74,8 +74,10 @@ const PricingPackage = (props) => {
 
     const dates = Array.isArray(props.dates) ? props.dates : [];
 
+    console.log(wcfeatured)
+
     const price = (packages.length ? packages.map((key) => pricing[key].price).reduce((total, current) => total + current) : 0);
-    const processing_fee = price * 5 / 100;
+    const processing_fee = price * wcfeatured.pricing.processing_fee / 100;
 
     const total_price = (price + processing_fee) * dates.length
 
@@ -125,7 +127,7 @@ const PricingPackage = (props) => {
             }
 
             <tr class="proccessing-fee">
-                <td colSpan={2}>Processing Fee (5%)</td>
+                <td colSpan={2}>Processing Fee ({wcfeatured.pricing.processing_fee}%)</td>
                 <td>{processing_fee.toFixed(2)} x {dates.length} = {(processing_fee * dates.length).toFixed(2)} USD</td>
             </tr>
 
@@ -167,7 +169,7 @@ const FeatureVendorAdd = (props) => {
         category: '',
         subcategory: '',
         dates: [],
-        packages: ['home_page', 'category']
+        packages: []
     });
 
     const { dates, category, subcategory, packages } = state;
@@ -321,7 +323,7 @@ const FeaturedProductForm = (props) => {
         dates: [],
         category: '',
         subcategory: null,
-        packages: ['home_page', 'category']
+        packages: []
     });
 
     const { id, category, subcategory, dates, packages } = product;

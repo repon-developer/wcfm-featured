@@ -4,14 +4,19 @@ function get_wcfm_vendor_featured_url($endpoint = 'wcfm-featured') {
     return wcfm_get_endpoint_url( $endpoint, '', get_wcfm_page());
 }
 
-function get_wcfm_limit($type = 'vendor') {
-    if ( $type == 'products') return 3; //6
-    return 3; //8
+function get_wcfm_limit($key = 'stores') {
+    $feature_limit = wp_parse_args(wcfm_get_option( 'wcfm_featured_limit' ), ['stores' => '8', 'product' => '6']);
+    if ( !empty($feature_limit[$key]) ) {
+        return $feature_limit[$key];
+    }
+
+    return 3;
 }
 
 function get_wcfm_feature_pricing() {
     $pricing['vendor'] = wp_parse_args(wcfm_get_option( 'wcfm_featured_vendor_pricing' ), ['home_page' => 40, 'category' => 30, 'subcategory' => 20]);
     $pricing['product'] = wp_parse_args(wcfm_get_option('wcfm_featured_product_pricing'), ['home_page' => 40, 'category' => 30, 'subcategory' => 20]);
+    $pricing['processing_fee'] = absint( wcfm_get_option('wcfm_featured_processing_fee', 5) );
     return $pricing;
 }
 

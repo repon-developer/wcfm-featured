@@ -56,7 +56,22 @@
                 'desc_class' => 'wcfm_page_options_desc', 
                 'value' => $featured_vendor_pricing['category'], 
             ),
-        ) ); ?>
+        ) );
+
+        $wcfm_featured_limit = wp_parse_args(wcfm_get_option( 'wcfm_featured_limit' ), ['stores' => '8', 'products' => '6']);
+        
+        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
+            "wcfm_featured_limit[stores]" => array(
+                'label' => __('Product Limit', 'wc-multivendor-featured') , 
+                'type' => 'text', 
+                'class' => 'wcfm-text wcfm_ele', 
+                'label_class' => 'wcfm_title', 
+                'desc_class' => 'wcfm_page_options_desc', 
+                'value' => $wcfm_featured_limit['stores'], 
+            ),
+        ) );
+        
+        ?>
 
         <div class="wcfm_clearfix"></div>
         <h2><?php _e('Featured Product Pricing', 'wc-multivendor-featured'); ?></h2>
@@ -95,6 +110,32 @@
                 'value' => $featured_product_pricing['subcategory'], 
             ),
         ) );
+
+        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
+            "wcfm_featured_limit[products]" => array(
+                'label' => __('Product Limit', 'wc-multivendor-featured') , 
+                'type' => 'text', 
+                'class' => 'wcfm-text wcfm_ele', 
+                'label_class' => 'wcfm_title', 
+                'desc_class' => 'wcfm_page_options_desc', 
+                'value' => $wcfm_featured_limit['products'], 
+            ),
+        ) );
 	    ?>
+        <div class="wcfm_clearfix"></div>
+        <h2><?php _e('Proccessing Fee', 'wc-multivendor-featured'); ?></h2>
+        <div class="wcfm_clearfix"></div>
+        <?php
+        $wcfm_featured_processing_fee = wcfm_get_option( 'wcfm_featured_processing_fee' );
+        $WCFM->wcfm_fields->wcfm_generate_form_field(array(
+            "wcfm_featured_processing_fee" => array(
+                'label' => __('Proccessing Fee', 'wc-multivendor-featured') , 
+                'type' => 'text', 
+                'class' => 'wcfm-text wcfm_ele', 
+                'label_class' => 'wcfm_title', 
+                'desc_class' => 'wcfm_page_options_desc', 
+                'value' => $wcfm_featured_processing_fee, 
+            ),
+        ) ); ?>
     </div>
 </div>
