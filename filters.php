@@ -103,6 +103,6 @@ add_action( 'woocommerce_before_shop_loop_item', function(){
 
     $term_id = get_post_meta( get_the_id(), $meta_key, true);
     if ( $meta_value == $term_id ) {
-        echo '<span class="wcfm-featured">Featured</span>';
+        echo '<span class="wcfm-featured" title="featured by BLEX Store"></span>';
     }
 });

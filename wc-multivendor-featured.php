@@ -44,7 +44,7 @@ add_action( 'wcfmmp_loaded', function(){
 add_action( 'init', function(){
 	if (!isset($_GET['dev']) ) return;
 	
-	$data = get_wcfm_products_filled_dates();
+	$data = get_wcfm_limit('products');
 	var_dump($data);
 	exit;
 });
