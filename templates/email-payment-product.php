@@ -8,7 +8,7 @@ $store_name     = empty( $store_name ) ? $user->display_name : $store_name;
 
 ?>
 
-<p>Thank you "<b><?php echo $store_name; ?></b>" for featuring your product(s) on BLEX. Please allow us 24 hours to approve your product(s). 
+<p>Thank you "<b><?php echo $store_name; ?></b>" for featuring your product(s) on BLEX. Please allow us an hour to approve your product(s). 
 Once approved, your product(s) will be featured on <?php echo $date_string; ?>.</p>
 
 <table class="table-email-payment-confirm" style="border:1px solid #ccc;border-collapse:collapse">

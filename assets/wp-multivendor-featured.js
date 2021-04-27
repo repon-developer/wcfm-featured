@@ -503,8 +503,8 @@ const MultivendorFeatured = () => {
     return (
         <React.Fragment>
             <FeatureVendorAdd _nonce={nonce_vendor_featured} />
-            <FeaturedDates products={featured_products} />
             <FeaturedProductForm _nonce={nonce_featured_products} />
+            <FeaturedDates products={featured_products} />
         </React.Fragment>
     )
 }
