@@ -71,7 +71,7 @@ class WCFM_Multivendor_Featured_Endpoint {
     public function wcfm_customers_load_scripts( $end_point ) {
         if ( 'wcfm-featured' !== $end_point) return;
 
-        $products = wc_get_products(['limit' => -1]);
+        $products = wc_get_products(['limit' => -1, 'author' => get_current_user_id(  )]);
         array_walk($products, function(&$product) {
             $id = $product->id;
             $product = array(
